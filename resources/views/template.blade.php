@@ -66,14 +66,18 @@
         <a href="/penjualan"><i class="bi bi-cash-stack"></i> Penjualan</a>
         <a href="/barang"><i class="bi bi-box"></i> Tambah Barang</a>
         <a href="/restok"><i class="bi bi-arrow-repeat"></i> Restok</a>
-        <a href="/laporan"><i class="bi bi-file-earmark-text"></i> Laporan Penjualan</a>
+        <a href="/laporan"><i class="bi bi-file-earmark-text"></i> Laporan Inventaris</a>
     </div>
 
-    <!-- Logout -->
-    <div class="logout">
-        <a href="/logout" class="text-danger fw-bold">
+   <div class="logout">
+        <a href="#" class="text-danger fw-bold" 
+        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <i class="bi bi-box-arrow-right"></i> Keluar
         </a>
+
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+            @csrf
+        </form>
     </div>
 
 </div>

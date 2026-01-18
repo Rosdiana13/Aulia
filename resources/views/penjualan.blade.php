@@ -1,89 +1,126 @@
 @extends('template')
 
-@section('title','Penjualan')
+@section('title','Barang Keluar')
 
 @section('content')
 
-<div class="mb-4 p-3 text-white rounded shadow-sm" style="background:#1F447A;">
-    <h4 class="mb-0">
-        <i class="bi bi-cash-stack"></i> Transaksi Penjualan
-    </h4>
-</div>
+@if(session('login_success'))
+    <div id="success-alert" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <strong>Berhasil!</strong> {{ session('login_success') }}
+        <button type="button" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
 
-<div class="row">
+<form action="{{ url('/penjualan/store') }}" method="POST">
+    @csrf <div class="mb-4 p-3 text-white rounded shadow-sm" style="background:#1F447A;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="bi bi-box-arrow-right"></i> Transaksi Barang Keluar
+            </h4>
+            <span class="badge bg-light text-dark">{{ date('d M Y') }}</span>
+        </div>
+    </div>
 
-    <!-- Input Scan / Cari Barang -->
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-header text-white" style="background:#1F447A;">
-                Scan / Cari Barang
-            </div>
-            <div class="card-body">
+    <div class="row">
 
-                <label class="form-label">Barcode / Nama Barang</label>
-                <input type="text" class="form-control mb-2" placeholder="Scan barcode atau ketik nama...">
-
-                <button class="btn w-100 text-white" style="background:#1F447A;">
-                    Tambah
-                </button>
-
-                <div class="alert alert-danger mt-3 d-none">
-                    Barang tidak ditemukan
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-header text-white" style="background:#1F447A;">
+                    Info Transaksi
                 </div>
-
+                <div class="card-body">
+                    <label class="form-label">Scan Barcode / Cari Barang</label>
+                    <div class="input-group">
+                        <input type="text" id="input-barcode" class="form-control" placeholder="Scan atau ketik...">
+                        <button type="button" class="btn text-white" style="background:#1F447A;" onclick="tambahBarang()">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted">Tekan enter untuk tambah otomatis</small>
+                </div>
             </div>
         </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header text-white" style="background:#1F447A;">
+                    Daftar Barang Keluar
+                </div>
+                <div class="card-body p-0">
+
+                    <table class="table table-striped mb-0" id="tabel-keranjang">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nama Barang</th>
+                                <th width="15%">Qty</th>
+                                <th>Nilai Aset (Rp)</th> 
+                                <th>Subtotal</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    Kaos Aulia
+                                    <input type="hidden" name="items[0][id_barang]" value="uuid-barang-1">
+                                    <input type="hidden" name="items[0][harga_saat_ini]" value="50000">
+                                </td>
+                                <td>
+                                    <input type="number" name="items[0][qty]" value="1" class="form-control form-control-sm" min="1">
+                                </td>
+                                <td>50.000</td>
+                                <td>50.000</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                    <div id="pesan-kosong" class="p-4 text-center text-muted">
+                        Belum ada barang yang dipilih
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted">Total Aset Keluar:</span>
+                        <h4 class="mb-0 fw-bold">Rp <span id="label-total">50.000</span></h4>
+                        <input type="hidden" name="total_transaksi" id="input-total" value="50000">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-save"></i> Simpan Data
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
     </div>
-
-    <!-- Tabel Keranjang -->
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header text-white" style="background:#1F447A;">
-                Daftar Barang
-            </div>
-            <div class="card-body p-0">
-
-                <table class="table table-striped mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Barcode</th>
-                            <th>Nama Barang</th>
-                            <th>Harga</th>
-                            <th>Qty</th>
-                            <th>Subtotal</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Contoh item -->
-                        <tr>
-                            <td>899123</td>
-                            <td>Kaos Aulia</td>
-                            <td>50.000</td>
-                            <td>1</td>
-                            <td>50.000</td>
-                            <td>
-                                <button class="btn btn-sm btn-danger">X</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-            </div>
-        </div>
-
-        <!-- Total & Bayar -->
-        <div class="card shadow-sm mt-3">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <h4>Total: Rp 50.000</h4>
-                <button class="btn btn-success btn-lg">
-                    <i class="bi bi-cash"></i> Bayar
-                </button>
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
+</form>
 @endsection
+
+<script>
+    // Tunggu sampai halaman selesai dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+        const alert = document.getElementById('success-alert');
+        if (alert) {
+            // Set waktu tunggu 3000ms (3 detik) sebelum hilang
+            setTimeout(function() {
+                // Gunakan class Bootstrap untuk efek fade out
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+                
+                // Hapus elemen dari layar setelah transisi selesai
+                setTimeout(function() {
+                    alert.remove();
+                }, 500); 
+            }, 3000); 
+        }
+    });
+</script>

@@ -2,43 +2,53 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+// Mengambil alat 'Authenticatable' agar file ini punya kemampuan fitur Login/Keamanan.
 use Illuminate\Foundation\Auth\User as Authenticatable;
+// Mengambil alat 'Notifiable' agar sistem bisa mengirimkan notifikasi jika diperlukan.
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use Notifiable;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
+     * PENGATURAN TABEL DATABASE
      */
+    
+    // Memberitahu Laravel bahwa nama tabel di database adalah 'Pengguna', bukan 'users'.
+    protected $table = 'Pengguna'; 
+
+    // Memberitahu bahwa kolom kunci utama (Primary Key) bernama 'id'.
+    protected $primaryKey = 'id';
+
+    // Karena id kita kemungkinan besar pakai UUID (string acak) atau manual, 
+    // kita set 'false' agar Laravel tidak otomatis menganggapnya angka yang bertambah sendiri.
+    public $incrementing = false;
+
+    // Memberitahu bahwa tipe data Primary Key adalah teks (string), bukan angka (integer).
+    protected $keyType = 'string';
+
+    // Kita set 'false' jika tabel kita tidak punya kolom otomatis 'created_at' dan 'updated_at'.
+    public $timestamps = false; 
+
+    /**
+     * PENGATURAN DATA
+     */
+
+    // Daftar kolom yang 'BOLEH' diisi secara massal (untuk keamanan agar tidak ada kolom rahasia yang terisi).
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'id', 'nama_pengguna', 'password', 'jabatan',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
+     * LOGIKA LOGIN KHUSUS
      */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    // INI PENTING: Secara standar, Laravel mencari kolom 'email' untuk login.
+    // Karena di Toko Aulia kita pakai 'nama_pengguna', fungsi ini wajib ada 
+    // untuk memberitahu Laravel: "Eh, carinya di kolom nama_pengguna ya!"
+    public function getAuthIdentifierName()
+    {
+        return 'nama_pengguna';
+    }
 }

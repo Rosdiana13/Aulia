@@ -1,38 +1,57 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
-Route::get('/template', function () {
-    return view('template');
+// 1. Saat pertama buka web, langsung lempar ke halaman Login
+Route::get('/', function () {
+    return redirect()->route('login');
 });
 
-Route::get('/Login', function(){
-    return view('Login');
+// 2. Route Autentikasi
+Route::controller(AuthController::class)->group(function () {
+    // Login
+    Route::get('/login', 'index')->name('login');
+    Route::post('/login', 'login');
+    
+    // Logout (Wajib POST untuk keamanan session)
+    Route::post('/logout', 'logout')->name('logout');
 });
 
-Route::get('/penjualan', function () {
-    return view('penjualan');
-});
+// 3. Kelompok Route yang HARUS Login dulu (Middleware Auth)
+Route::middleware(['auth'])->group(function () {
 
-Route::get('/barang', function () {
-    return view('barang');
-});
+    // Dashboard Utama
+    Route::get('/dashboard', function () {
+        return view('penjualan'); // Menggunakan template sebagai dashboard awal
+    })->name('dashboard');
 
-Route::get('/restok', function () {
-    return view('restok');
-});
+    // Fitur Inventori Toko Aulia
+    Route::get('/barang', function () {
+        return view('barang');
+    })->name('barang.index');
 
-Route::get('/laporan', function () {
-    return view('laporan');
+    Route::get('/penjualan', function () {
+        return view('penjualan');
+    })->name('penjualan.index');
+
+    Route::get('/restok', function () {
+        return view('restok');
+    })->name('restok.index');
+
+    Route::get('/laporan', function () {
+        return view('laporan');
+    })->name('laporan.index');
+    
+    // Fitur Penyesuaian Stok (Tambahan Penting!)
+    Route::get('/penyesuaian', function () {
+        return view('penyesuaian');
+    })->name('penyesuaian.index');
+
 });
