@@ -6,7 +6,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+   
 
     <style>
         body {
@@ -63,10 +63,12 @@
 
     <!-- Menu -->
     <div class="menu">
+        <a href="/dashboard"><i class="bi bi-home"></i> Dashboard</a>
         <a href="/penjualan"><i class="bi bi-cash-stack"></i> Penjualan</a>
-        <a href="/barang"><i class="bi bi-box"></i> Tambah Barang</a>
+        <a href="/barang"><i class="bi bi-box"></i> Barang</a>
         <a href="/restok"><i class="bi bi-arrow-repeat"></i> Restok</a>
         <a href="/laporan"><i class="bi bi-file-earmark-text"></i> Laporan Inventaris</a>
+        <a href="/kategori"><i class="bi bi-file-earmark-text"></i> Kategori</a>
     </div>
 
    <div class="logout">
@@ -86,5 +88,7 @@
     @yield('content')
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    @stack('scripts')
 </body>
 </html>

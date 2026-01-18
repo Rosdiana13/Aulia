@@ -21,7 +21,7 @@ class User extends Authenticatable
     // Memberitahu bahwa kolom kunci utama (Primary Key) bernama 'id'.
     protected $primaryKey = 'id';
 
-    // Karena id kita kemungkinan besar pakai UUID (string acak) atau manual, 
+    // Karena id pakai UUID (string acak), 
     // kita set 'false' agar Laravel tidak otomatis menganggapnya angka yang bertambah sendiri.
     public $incrementing = false;
 

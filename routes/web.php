@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\BarangController;
 
 /*
 |--------------------------------------------------------------------------
@@ -9,12 +11,12 @@ use App\Http\Controllers\AuthController;
 |--------------------------------------------------------------------------
 */
 
-// 1. Saat pertama buka web, langsung lempar ke halaman Login
+// Saat pertama buka web, langsung lempar ke halaman Login
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// 2. Route Autentikasi
+// Route Autentikasi
 Route::controller(AuthController::class)->group(function () {
     // Login
     Route::get('/login', 'index')->name('login');
@@ -24,18 +26,19 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/logout', 'logout')->name('logout');
 });
 
-// 3. Kelompok Route yang HARUS Login dulu (Middleware Auth)
+// Kelompok Route yang HARUS Login dulu (Middleware Auth)
 Route::middleware(['auth'])->group(function () {
 
     // Dashboard Utama
     Route::get('/dashboard', function () {
-        return view('penjualan'); // Menggunakan template sebagai dashboard awal
+        return view('dashboard');
     })->name('dashboard');
 
     // Fitur Inventori Toko Aulia
-    Route::get('/barang', function () {
-        return view('barang');
-    })->name('barang.index');
+    Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
+    Route::post('/barang/store', [BarangController::class, 'store']);
+    Route::post('/barang/update', [BarangController::class, 'update']);
+    Route::get('/barang/delete/{id}', [BarangController::class, 'destroy'])->name('barang.delete');
 
     Route::get('/penjualan', function () {
         return view('penjualan');
@@ -53,5 +56,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/penyesuaian', function () {
         return view('penyesuaian');
     })->name('penyesuaian.index');
+
+    // Menampilkan halaman kategori
+    Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');
+    
+    // Proses simpan kategori baru
+    Route::post('/kategori/store', [KategoriController::class, 'store'])->name('kategori.store');
+    
+    // Proses hapus kategori
+    Route::delete('/kategori/destroy/{id}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
 
 });

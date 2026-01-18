@@ -4,15 +4,9 @@
 
 @section('content')
 
-@if(session('login_success'))
-    <div id="success-alert" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-        <strong>Berhasil!</strong> {{ session('login_success') }}
-        <button type="button" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
-
 <form action="{{ url('/penjualan/store') }}" method="POST">
-    @csrf <div class="mb-4 p-3 text-white rounded shadow-sm" style="background:#1F447A;">
+    @csrf 
+    <div class="mb-4 p-3 text-white rounded shadow-sm" style="background:#1F447A;">
         <div class="d-flex justify-content-between align-items-center">
             <h4 class="mb-0">
                 <i class="bi bi-box-arrow-right"></i> Transaksi Barang Keluar
@@ -105,22 +99,4 @@
 </form>
 @endsection
 
-<script>
-    // Tunggu sampai halaman selesai dimuat
-    document.addEventListener('DOMContentLoaded', function() {
-        const alert = document.getElementById('success-alert');
-        if (alert) {
-            // Set waktu tunggu 3000ms (3 detik) sebelum hilang
-            setTimeout(function() {
-                // Gunakan class Bootstrap untuk efek fade out
-                alert.classList.remove('show');
-                alert.classList.add('fade');
-                
-                // Hapus elemen dari layar setelah transisi selesai
-                setTimeout(function() {
-                    alert.remove();
-                }, 500); 
-            }, 3000); 
-        }
-    });
-</script>
+

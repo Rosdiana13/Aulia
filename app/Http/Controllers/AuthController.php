@@ -32,7 +32,7 @@ class AuthController extends Controller
 
     /**
      * FUNGSI: Memproses verifikasi data login.
-     * Penjelasan: Fungsi ini menerima data dari form (POST), mengecek ke database, 
+     * Penjelasan: Fungsi ini menerima data dari form di view, mengecek ke database, 
      * dan membuatkan 'tiket masuk' (Session) jika datanya cocok.
      */
     public function login(Request $request)
@@ -53,7 +53,7 @@ class AuthController extends Controller
             
             /**
              * 3. Keamanan Sesi (Session Fixation):
-             * Sangat penting untuk Skripsi! Kita membuat ID session baru setelah login berhasil 
+             * Kita membuat ID session baru setelah login berhasil 
              * agar hacker yang memegang ID session lama tidak bisa masuk ke akun user.
              */
             $request->session()->regenerate();
