@@ -11,9 +11,15 @@
 </div>
 
 @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div id="auto-alert" class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+@if(session('error'))
+    <div id="auto-alert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Peringatan!</strong> {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
@@ -30,7 +36,7 @@
                         <label class="form-label">Nama Kategori</label>
                         <input type="text" name="Nama_Kategori" class="form-control" placeholder="Contoh: Elektronik, Pakaian" required>
                     </div>
-                    <button type="submit" class="btn w-100 text-white" style="background:#1F447A;">
+                    <button type="submit" class="btn w-100 text-white" onclick="return confirm('Anda yakin mau menambahkan data barang ini?')" style="background:#1F447A;">
                         <i class="bi bi-plus-circle"></i> Simpan Kategori
                     </button>
                 </form>
@@ -78,5 +84,19 @@
         </div>
     </div>
 </div>
+
+<SCript>
+    window.onload = function() {
+        const alert = document.getElementById('auto-alert');
+        if (alert) {
+            setTimeout(function() {
+                // Tambahkan class 'fade' dari Bootstrap untuk animasi halus
+                alert.classList.add('fade');
+                // Tunggu 500ms (durasi animasi fade) baru hapus dari layar
+                setTimeout(() => alert.remove(), 500);
+            }, 2000); // Tampil selama 3 detik
+        }
+    };
+</SCript>
 
 @endsection

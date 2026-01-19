@@ -63,12 +63,13 @@
 
     <!-- Menu -->
     <div class="menu">
-        <a href="/dashboard"><i class="bi bi-home"></i> Dashboard</a>
+        <a href="/dashboard"><i class="bi-house"></i> Dashboard</a>
         <a href="/penjualan"><i class="bi bi-cash-stack"></i> Penjualan</a>
         <a href="/barang"><i class="bi bi-box"></i> Barang</a>
         <a href="/restok"><i class="bi bi-arrow-repeat"></i> Restok</a>
         <a href="/laporan"><i class="bi bi-file-earmark-text"></i> Laporan Inventaris</a>
-        <a href="/kategori"><i class="bi bi-file-earmark-text"></i> Kategori</a>
+        <a href="/kategori"><i class="bi-grid"></i> Kategori</a>
+        <a href="/kategori"><i class="bi-people"></i> Pengguna</a>
     </div>
 
    <div class="logout">

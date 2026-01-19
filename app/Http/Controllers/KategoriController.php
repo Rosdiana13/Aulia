@@ -25,14 +25,24 @@ class KategoriController extends Controller
      */
     public function store(Request $request)
     {
-        // Simpan ke Database
+        // 1. Ubah input user jadi huruf kecil semua
+        $inputNama = strtolower($request->Nama_Kategori);
+
+        // 2. Cek di database dengan merubah isi kolom Nama_Kategori jadi kecil semua juga
+        $cekDuplikat = Kategori::whereRaw('LOWER(Nama_Kategori) = ?', [$inputNama])->exists();
+
+        if ($cekDuplikat) {
+            // Jika kedeteksi sama, balikkan pesan error
+            return redirect()->back()->with('error', "Kategori '$request->Nama_Kategori' sudah ada!");
+        }
+
+        // 3. Jika benar-benar baru, baru simpan
         Kategori::create([
-            'id' => Str::uuid(), // Membuat ID unik otomatis (karena bukan auto-increment)
+            'id' => (string) \Illuminate\Support\Str::uuid(),
             'Nama_Kategori' => $request->Nama_Kategori,
         ]);
 
-        // Kembali ke halaman sebelumnya dengan pesan sukses
-        return redirect()->back()->with('success', 'Kategori baru berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Kategori berhasil ditambah!');
     }
 
     /**
@@ -40,8 +50,18 @@ class KategoriController extends Controller
      */
     public function destroy($id)
     {
-        // Cari kategori berdasarkan ID, jika ada langsung hapus
+        // 1. Cari kategori berdasarkan ID
         $kategori = Kategori::findOrFail($id);
+
+        // 2. Cek apakah ada barang yang terhubung (menggunakan relasi barang() di Model)
+        if ($kategori->barang()->exists()) {
+            // Jika ada, kirim pesan error dan batalkan penghapusan
+            return redirect()->back()->with('error', 
+                "Gagal menghapus! Kategori '{$kategori->Nama_Kategori}' masih memiliki data barang di dalamnya. Hapus atau pindahkan data barang terlebih dahulu."
+            );
+        }
+
+        // 3. Jika tidak ada relasi, hapus kategori
         $kategori->delete();
 
         return redirect()->back()->with('success', 'Kategori berhasil dihapus!');
