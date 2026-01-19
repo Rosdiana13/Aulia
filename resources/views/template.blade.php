@@ -69,7 +69,7 @@
         <a href="/restok"><i class="bi bi-arrow-repeat"></i> Restok</a>
         <a href="/laporan"><i class="bi bi-file-earmark-text"></i> Laporan Inventaris</a>
         <a href="/kategori"><i class="bi-grid"></i> Kategori</a>
-        <a href="/kategori"><i class="bi-people"></i> Pengguna</a>
+        <a href="/pengguna"><i class="bi-people"></i> Pengguna</a>
     </div>
 
    <div class="logout">

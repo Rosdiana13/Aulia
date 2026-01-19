@@ -16,6 +16,9 @@ use Illuminate\Http\Request;
 // Mengambil alat 'Auth' yang berisi fungsi keamanan bawaan Laravel 
 // seperti mengecek password, login, dan logout.
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -75,6 +78,48 @@ class AuthController extends Controller
         return back()->withErrors([
             'nama_pengguna' => 'Username atau password yang Anda masukkan salah.',
         ])->onlyInput('nama_pengguna');
+    }
+
+    public function showRegisterForm()
+    {
+        // Mengambil semua data pengguna dari tabel Pengguna
+        $semua_pengguna = \App\Models\User::all();
+        
+        // Kirim data ke view 'pengguna'
+        return view('pengguna', compact('semua_pengguna'));
+    }
+
+    public function register(Request $request)
+    {
+        // 1. Validasi input
+        $request->validate([
+            'nama_pengguna' => 'required|unique:Pengguna,nama_pengguna',
+            'password' => 'required|min:5',
+            'jabatan' => 'required'
+        ]);
+
+        // 2. Simpan ke database
+        User::create([
+            'id' => (string) Str::uuid(), // Generate UUID otomatis
+            'nama_pengguna' => $request->nama_pengguna,
+            'password' => Hash::make($request->password), // Enkripsi password
+            'jabatan' => $request->jabatan,
+        ]);
+
+        return back()->with('success', 'Pengguna baru berhasil didaftarkan!');
+    }
+
+    public function destroy($id)
+    {
+        // Cari pengguna berdasarkan ID
+        $user = \App\Models\User::find($id);
+
+        if ($user) {
+            $user->delete();
+            return back()->with('success', 'Akun pengguna berhasil dihapus.');
+        }
+
+        return back()->with('error', 'Data pengguna tidak ditemukan.');
     }
 
     /**

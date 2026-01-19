@@ -66,4 +66,14 @@ Route::middleware(['auth'])->group(function () {
     // Proses hapus kategori
     Route::delete('/kategori/destroy/{id}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
 
+    // Route untuk pendaftaran pengguna baru yang tadi kita buat
+    // Menampilkan form (Halaman Pengguna)
+    Route::get('/pengguna', [AuthController::class, 'showRegisterForm']);
+
+    // Proses Simpan
+    Route::post('/register', [AuthController::class, 'register']);
+
+    // Route untuk menghapus pengguna
+    Route::get('/pengguna/delete/{id}', [AuthController::class, 'destroy']);
+
 });
