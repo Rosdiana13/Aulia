@@ -25,4 +25,14 @@ class Data_Barang extends Model
     {
         return $this->belongsTo(Kategori::class, 'id_kategori', 'id');
     }
+
+     // untuk membua harga satuan
+    public function getHargaSatuanAttribute()
+    {
+        // Mencegah pembagian dengan angka nol
+        if ($this->jumlah > 0) {
+            return $this->harga_beli / $this->jumlah;
+        }
+        return 0;
+    }
 }

@@ -10,12 +10,23 @@ use Illuminate\Support\Str;
 class BarangController extends Controller
 {
     // MENAMPILKAN DATA
-    public function index()
+    public function index(Request $request)
     {
-        // Eager loading 'kategori' agar tidak berat saat load data
-        $barang = Data_Barang::with('kategori')->get();
+        $search = $request->input('search');
+
+        $barang = Data_Barang::with('kategori')
+            ->when($search, function($query) use ($search) {
+                // Kita bungkus dalam grup 'where' agar logika OR tidak bertabrakan dengan filter lain
+                $query->where(function($q) use ($search) {
+                    $q->where('nama_barang', 'like', '%' . $search . '%')
+                    ->orWhereHas('kategori', function($cat) use ($search) {
+                        $cat->where('Nama_Kategori', 'like', '%' . $search . '%');
+                    });
+                });
+            })
+            ->get();
+
         $kategori = Kategori::all(); 
-        
         return view('barang', compact('barang', 'kategori'));
     }
 
@@ -43,19 +54,35 @@ class BarangController extends Controller
     // UPDATE DATA
     public function update(Request $request) {
         $barang = Data_Barang::findOrFail($request->id_barang);
+        
+        // Hapus harga_beli dan jumlah agar tidak bisa dimanipulasi manual
         $barang->update([
             'nama_barang' => $request->nama_barang,
-            'harga_beli' => $request->harga_beli,
-            'harga_jual' => $request->harga_jual,
-            'jumlah' => $request->jumlah,
+            'harga_jual'  => $request->harga_jual,
             'id_kategori' => $request->kategori
         ]);
+        
         return back()->with('success', 'Data barang diperbarui!');
     }
 
-    // HAPUS DATA
     public function destroy($id) {
-        Data_Barang::destroy($id);
-        return back()->with('success', 'Barang telah dihapus!');
+    // 1. Cari data barang berdasarkan ID
+    $barang = Data_Barang::find($id);
+
+    // 2. Cek apakah barang ditemukan
+    if (!$barang) {
+        return back()->with('error', 'Data barang tidak ditemukan!');
     }
+
+    // 3. Cek apakah stok (jumlah) lebih dari 0
+    // Sesuaikan nama kolom 'jumlah' dengan yang ada di database Anda (misal: 'stok')
+    if ($barang->jumlah > 0) {
+        return back()->with('error', 'Barang tidak bisa dihapus karena masih ada stok (' . $barang->jumlah . ')!');
+    }
+
+    // 4. Jika stok 0, maka hapus
+    $barang->delete();
+
+    return back()->with('success', 'Barang telah dihapus!');
+}
 }
