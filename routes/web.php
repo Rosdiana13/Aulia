@@ -63,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
     // Proses simpan kategori baru
     Route::post('/kategori/store', [KategoriController::class, 'store'])->name('kategori.store');
     
+    
     // Proses hapus kategori
     Route::delete('/kategori/destroy/{id}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
 

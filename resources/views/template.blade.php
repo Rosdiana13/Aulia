@@ -67,6 +67,7 @@
         <a href="/penjualan"><i class="bi bi-cash-stack"></i> Penjualan</a>
         <a href="/barang"><i class="bi bi-box"></i> Barang</a>
         <a href="/restok"><i class="bi bi-arrow-repeat"></i> Restok</a>
+        <a href="/penyesuaian"><i class="bi bi-sliders"></i> Penyesuaian</a>
         <a href="/laporan"><i class="bi bi-file-earmark-text"></i> Laporan Inventaris</a>
         <a href="/kategori"><i class="bi-grid"></i> Kategori</a>
         <a href="/pengguna"><i class="bi-people"></i> Pengguna</a>

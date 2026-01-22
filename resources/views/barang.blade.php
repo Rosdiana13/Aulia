@@ -110,7 +110,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($barang as $b)
+                            @forelse($barang as $b)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td class="text-start">
@@ -140,7 +140,14 @@
                                     </a>
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">
+                                    <i class="bi bi-info-circle d-block mb-2" style="font-size: 2rem;"></i>
+                                    Belum ada inputan barang
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
