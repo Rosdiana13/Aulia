@@ -38,52 +38,31 @@ class AuthController extends Controller
      * Penjelasan: Fungsi ini menerima data dari form di view, mengecek ke database, 
      * dan membuatkan 'tiket masuk' (Session) jika datanya cocok.
      */
-    public function login(Request $request)
+   public function login(Request $request)
     {
-        // 1. Validasi: Filter awal untuk memastikan user tidak mengirim data kosong ke server.
-        // Jika kosong, sistem akan langsung menolak.
         $credentials = $request->validate([
             'nama_pengguna' => 'required|string',
             'password' => 'required|string',
         ]);
 
-        /**
-         * 2. Autentikasi Utama:
-         * Laravel secara cerdas membandingkan password teks biasa dari form 
-         * dengan password Bcrypt (acak) yang ada di database menggunakan 'Auth::attempt'.
-         */
-        if (Auth::attempt(['nama_pengguna' => $request->nama_pengguna, 'password' => $request->password])) {
-            
-            /**
-             * 3. Keamanan Sesi (Session Fixation):
-             * Kita membuat ID session baru setelah login berhasil 
-             * agar hacker yang memegang ID session lama tidak bisa masuk ke akun user.
-             */
+        // Tambahkan 'status' => 1 agar pengguna non-aktif tidak bisa masuk
+        if (Auth::attempt(['nama_pengguna' => $request->nama_pengguna, 'password' => $request->password, 'status' => 1])) {
             $request->session()->regenerate();
-
-            /**
-             * 4. Pengalihan (Redirect):
-             * Mengirim user ke dashboard. 'intended' artinya jika tadi user mencoba buka 
-             * halaman laporan tapi dipaksa login, maka setelah login ia otomatis ke laporan.
-             * 'with' mengirim pesan sukses yang hanya muncul satu kali (Flash Message).
-             */
-            return redirect()->intended('/dashboard')->with('login_success', 'Selamat Datang! Anda berhasil login ke sistem Toko Aulia.');
+            return redirect()->intended('/dashboard')->with('login_success', 'Selamat Datang!');
         }
 
-        /**
-         * 5. Logika Gagal: 
-         * Jika password/username salah, kita kembalikan user ke posisi semula.
-         * 'onlyInput' menjaga agar nama yang sudah diketik tidak hilang (user-friendly).
-         */
         return back()->withErrors([
-            'nama_pengguna' => 'Username atau password yang Anda masukkan salah.',
+            'nama_pengguna' => 'Username salah, password salah, atau akun Anda dinonaktifkan.',
         ])->onlyInput('nama_pengguna');
     }
 
     public function showRegisterForm()
     {
-        // Mengambil semua data pengguna dari tabel Pengguna
-        $semua_pengguna = \App\Models\User::all();
+        // Mengambil data pengguna yang HANYA berstatus aktif
+        // Diurutkan berdasarkan nama agar rapi
+        $semua_pengguna = \App\Models\User::where('status', 1)
+                            ->orderBy('nama_pengguna', 'asc')
+                            ->get();
         
         // Kirim data ke view 'pengguna'
         return view('pengguna', compact('semua_pengguna'));
@@ -91,19 +70,38 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        // 1. Validasi input
+        // 1. Validasi input (Hapus 'unique' agar tidak error saat input nama yang sudah ada di database)
         $request->validate([
-            'nama_pengguna' => 'required|unique:Pengguna,nama_pengguna',
+            'nama_pengguna' => 'required',
             'password' => 'required|min:5',
             'jabatan' => 'required'
         ]);
 
-        // 2. Simpan ke database
+        // 2. Cek apakah username sudah pernah terdaftar sebelumnya
+        $userAda = User::where('nama_pengguna', $request->nama_pengguna)->first();
+
+        if ($userAda) {
+            if ($userAda->status == 0) {
+                // Jika akun ada tapi non-aktif, kita aktifkan kembali (Reactivate)
+                $userAda->update([
+                    'password' => Hash::make($request->password),
+                    'jabatan' => $request->jabatan,
+                    'status' => 1 // Aktifkan lagi
+                ]);
+                return back()->with('success', 'Akun lama berhasil diaktifkan kembali!');
+            } else {
+                // Jika akun ada dan masih aktif, beri pesan error
+                return back()->with('error', 'Nama pengguna sudah terpakai dan masih aktif.');
+            }
+        }
+
+        // 3. Jika benar-benar baru, buat baris baru
         User::create([
-            'id' => (string) Str::uuid(), // Generate UUID otomatis
+            'id' => (string) Str::uuid(),
             'nama_pengguna' => $request->nama_pengguna,
-            'password' => Hash::make($request->password), // Enkripsi password
+            'password' => Hash::make($request->password),
             'jabatan' => $request->jabatan,
+            'status' => 1,
         ]);
 
         return back()->with('success', 'Pengguna baru berhasil didaftarkan!');
@@ -112,21 +110,19 @@ class AuthController extends Controller
     public function destroy($id)
     {
         // Cari pengguna berdasarkan ID
-        $user = \App\Models\User::find($id);
+        $user = User::find($id);
 
         if ($user) {
-            $user->delete();
-            return back()->with('success', 'Akun pengguna berhasil dihapus.');
+            // Jangan dihapus permanen, cukup ubah status ke 0
+            $user->update(['status' => 0]);
+            
+            return back()->with('success', 'Akun pengguna telah dinonaktifkan (Data transaksi tetap aman).');
         }
 
         return back()->with('error', 'Data pengguna tidak ditemukan.');
     }
 
-    /**
-     * FUNGSI: Mengakhiri sesi pengguna secara aman.
-     * Penjelasan: Tidak hanya sekedar keluar, fungsi ini membersihkan semua jejak 
-     * digital di server agar akun tidak bisa dibajak setelah logout.
-     */
+    // Fusngsi untuk mengakhiri sesi
     public function logout(Request $request)
     {
         // Menghapus status 'Authenticated' pada sistem Laravel

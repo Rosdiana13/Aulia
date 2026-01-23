@@ -80,15 +80,29 @@
                             <tr>
                                 <th class="text-start ps-3">Tanggal</th>
                                 <th class="text-start">Nama Barang</th>
-                                <th>Stok Awal</th>
-                                <th>Tipe</th>
-                                <th>Qty</th>
-                                <th class="text-start">Alasan</th>
+                                <th>Stok Sblmnya</th>
+                                <th>Alasan</th>
+                                <th>Jumlah</th>
+                                <th>Deskripsi</th>
                             </tr>
                         </thead>
                         <tbody id="tabel-log">
-                            <tr id="row-empty">
-                                <td colspan="6" class="py-5 text-muted">Belum ada riwayat koreksi untuk sesi ini.</td>
+                            {{-- DATA DUMMY DENGAN BADGE NETRAL (SECONDARY) --}}
+                            <tr>
+                                <td class="text-start ps-3"><small class="text-muted">23/01/2026 08:30</small></td>
+                                <td class="text-start"><strong>Jilbab Syari</strong></td>
+                                <td><span class="text-muted">26</span></td>
+                                <td><span class="badge bg-secondary">Keluar</span></td>
+                                <td class="fw-bold">1</td>
+                                <td class="text-start small text-secondary">Kain sobek di gudang</td>
+                            </tr>
+                            <tr>
+                                <td class="text-start ps-3"><small class="text-muted">22/01/2026 14:15</small></td>
+                                <td class="text-start"><strong>Sajadah Travel</strong></td>
+                                <td><span class="text-muted">42</span></td>
+                                <td><span class="badge bg-secondary">Keluar</span></td>
+                                <td class="fw-bold">2</td>
+                                <td class="text-start small text-secondary">Barang hilang saat opname</td>
                             </tr>
                         </tbody>
                     </table>
@@ -103,7 +117,6 @@
 
 <script>
     $(document).ready(function() {
-        // Inisialisasi Fitur Cari pada Select
         $('.select-cari').select2({
             placeholder: "-- Ketik Nama Barang --",
             allowClear: true,
@@ -131,10 +144,10 @@
 
         if (confirm(`Simpan penyesuaian stok untuk ${nama}?`)) {
             const tbody = document.getElementById('tabel-log');
-            const rowEmpty = document.getElementById('row-empty');
-            if (rowEmpty) rowEmpty.remove();
-
-            const badge = tipe === 'Masuk' ? 'bg-success' : 'bg-danger';
+            
+            // Badge diset ke bg-secondary (abu-abu gelap) untuk semua kondisi
+            const badge = 'bg-secondary';
+            
             const row = `
                 <tr>
                     <td class="text-start ps-3"><small class="text-muted">${tglString}</small></td>
@@ -147,7 +160,6 @@
             `;
             tbody.insertAdjacentHTML('afterbegin', row);
 
-            // Reset Form & Reset Select2
             document.getElementById('formPenyesuaian').reset();
             $('.select-cari').val(null).trigger('change'); 
             

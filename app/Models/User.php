@@ -37,12 +37,8 @@ class User extends Authenticatable
 
     // Daftar kolom yang 'BOLEH' diisi secara massal (untuk keamanan agar tidak ada kolom rahasia yang terisi).
     protected $fillable = [
-        'id', 'nama_pengguna', 'password', 'jabatan',
+        'id', 'nama_pengguna', 'password', 'jabatan', 'status',
     ];
-
-    /**
-     * LOGIKA LOGIN KHUSUS
-     */
 
     // INI PENTING: Secara standar, Laravel mencari kolom 'email' untuk login.
     // Karena di Toko Aulia kita pakai 'nama_pengguna', fungsi ini wajib ada 

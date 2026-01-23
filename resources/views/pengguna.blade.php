@@ -68,22 +68,22 @@
                         </thead>
                         <tbody>
                             @foreach($semua_pengguna as $key => $u)
-                            <tr>
-                                <td class="text-center">{{ $key + 1 }}</td>
-                                <td><strong>{{ $u->nama_pengguna }}</strong></td>
-                                <td>
-                                    <span class="badge {{ $u->jabatan == 'Pemilik' ? 'bg-primary' : 'bg-info text-dark' }}">
-                                        {{ $u->jabatan }}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <a href="{{ url('/pengguna/delete/'.$u->id) }}" 
-                                    class="btn btn-sm btn-outline-danger" 
-                                    onclick="return confirm('Apakah Anda yakin ingin menghapus akun {{ $u->nama_pengguna }}?')">
-                                        <i class="bi bi-trash"></i> Hapus
-                                    </a>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td class="text-center">{{ $key + 1 }}</td>
+                                    <td><strong>{{ $u->nama_pengguna }}</strong></td>
+                                    <td>
+                                        <span class="badge {{ $u->jabatan == 'Pemilik' ? 'bg-primary' : 'bg-info text-dark' }}">
+                                            {{ $u->jabatan }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ url('/pengguna/delete/'.$u->id) }}" 
+                                        class="btn btn-sm btn-danger" 
+                                        onclick="return confirm('Apakah Anda yakin ingin menonaktifkan akun {{ $u->nama_pengguna }}? Karyawan ini tidak akan bisa login, namun data transaksinya tetap tersimpan di sistem.')">
+                                            <i class="bi bi bi-trash"></i> Hapus
+                                        </a>
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
