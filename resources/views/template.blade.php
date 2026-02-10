@@ -66,11 +66,9 @@
         <a href="/dashboard"><i class="bi-house"></i> Dashboard</a>
         <a href="/penjualan"><i class="bi bi-cash-stack"></i> Penjualan</a>
         <a href="/barang"><i class="bi bi-box"></i> Barang</a>
-        <a href="/restok"><i class="bi bi-arrow-repeat"></i> Restok</a>
-        <!-- <a href="/penyesuaian"><i class="bi bi-sliders"></i> Penyesuaian</a> -->
-        <a href="/laporan"><i class="bi bi-file-earmark-text"></i> Laporan Analisis Pengendapan</a>
+        <a href="/pembelian"><i class="bi bi-arrow-repeat"></i> Pembelian</a>
+        <a href="/deadstock"><i class="bi bi-archive"></i> Dead Stock</a>
         <a href="/kategori"><i class="bi-grid"></i> Kategori</a>
-        <a href="/pengguna"><i class="bi-people"></i> Pengguna</a>
     </div>
 
    <div class="logout">

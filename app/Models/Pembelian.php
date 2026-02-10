@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Kategori extends Model
+class Pembelian extends Model
 {
-    protected $table = 'Kategori';
+    protected $table = 'pembelian';
 
     protected $primaryKey = 'id';
     public $incrementing = false;
@@ -16,8 +16,8 @@ class Kategori extends Model
 
     protected $fillable = [
         'id',
-        'Nama_Kategori',
-        'status'
+        'id_pengguna',
+        'total_pembelian'
     ];
 
     protected static function boot()
@@ -29,5 +29,10 @@ class Kategori extends Model
                 $model->id = (string) Str::uuid();
             }
         });
+    }
+
+    public function detail()
+    {
+        return $this->hasMany(DetailPembelian::class, 'id_pembelian');
     }
 }

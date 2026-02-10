@@ -10,40 +10,51 @@
     </h4>
 </div>
 
-@if(session('success'))
-    <div id="auto-alert" class="alert alert-success alert-dismissible fade show" role="alert">
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="autoAlert">
         {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
-@if(session('error'))
-    <div id="auto-alert" class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong>Peringatan!</strong> {{ session('error') }}
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="autoAlert">
+        {{ $errors->first() }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
+
 <div class="row">
+    {{-- FORM TAMBAH --}}
     <div class="col-md-4">
         <div class="card shadow-sm">
             <div class="card-header text-white" style="background:#1F447A;">
                 Tambah Kategori
             </div>
             <div class="card-body">
+                {{-- TAMBAHAN: FORM --}}
                 <form action="{{ route('kategori.store') }}" method="POST">
                     @csrf
+
                     <div class="mb-3">
                         <label class="form-label">Nama Kategori</label>
-                        <input type="text" name="Nama_Kategori" class="form-control" placeholder="Contoh: Elektronik, Pakaian" required>
+                        <input type="text"
+                               name="Nama_Kategori"
+                               class="form-control"
+                               placeholder="Contoh: Elektronik, Fesyen"
+                               required>
                     </div>
-                    <button type="submit" class="btn w-100 text-white" onclick="return confirm('Anda yakin mau menambahkan data barang ini?')" style="background:#1F447A;">
+
+                    <button class="btn w-100 text-white" style="background:#1F447A;">
                         <i class="bi bi-plus-circle"></i> Simpan Kategori
                     </button>
                 </form>
+
             </div>
         </div>
     </div>
 
+    {{-- TABEL KATEGORI --}}
     <div class="col-md-8">
         <div class="card shadow-sm">
             <div class="card-header text-white" style="background:#1F447A;">
@@ -55,29 +66,38 @@
                         <tr>
                             <th width="50">No</th>
                             <th>Nama Kategori</th>
-                            <th width="150">Aksi</th>
+                            <th width="180">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($kategori as $kat)
+
+                    {{-- TAMBAHAN: LOOP DATA --}}
+                    @foreach ($kategori as $item)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $kat->Nama_Kategori }}</td>
+                            <td>{{ $item->Nama_Kategori }}</td>
                             <td>
-                                <form action="{{ route('kategori.destroy', $kat->id) }}" method="POST" onsubmit="return confirm('Hapus kategori ini? Barang dengan kategori ini mungkin akan bermasalah.')">
+                                <button class="btn btn-sm btn-warning text-white"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal{{ $item->id }}">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+
+                                {{-- TAMBAHAN: HAPUS --}}
+                                <form action="{{ route('kategori.destroy', $item->id) }}"
+                                      method="POST"
+                                      class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
+                                    <button class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Yakin hapus kategori?')">
                                         <i class="bi bi-trash"></i> Hapus
                                     </button>
                                 </form>
                             </td>
                         </tr>
-                        @empty
-                        <tr>
-                            <td colspan="3" class="text-muted p-3">Belum ada kategori.</td>
-                        </tr>
-                        @endforelse
+                    @endforeach
+
                     </tbody>
                 </table>
             </div>
@@ -85,18 +105,56 @@
     </div>
 </div>
 
-<SCript>
-    window.onload = function() {
-        const alert = document.getElementById('auto-alert');
+{{-- MODAL EDIT --}}
+@foreach ($kategori as $item)
+<div class="modal fade" id="editModal{{ $item->id }}" tabindex="-1">
+    <div class="modal-dialog">
+        {{-- TAMBAHAN: FORM UPDATE --}}
+        <form action="{{ route('kategori.update', $item->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="modal-content">
+                <div class="modal-header text-white" style="background:#1F447A;">
+                    <h5 class="modal-title">Edit Kategori</h5>
+                    <button type="button" class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Kategori</label>
+                        <input type="text"
+                               name="Nama_Kategori"
+                               class="form-control"
+                               value="{{ $item->Nama_Kategori }}"
+                               required>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary"
+                            data-bs-dismiss="modal">Batal</button>
+                    <button class="btn text-white"
+                            style="background:#1F447A;">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@endforeach
+
+<script>
+    setTimeout(function () {
+        const alert = document.getElementById('autoAlert');
         if (alert) {
-            setTimeout(function() {
-                // Tambahkan class 'fade' dari Bootstrap untuk animasi halus
-                alert.classList.add('fade');
-                // Tunggu 500ms (durasi animasi fade) baru hapus dari layar
-                setTimeout(() => alert.remove(), 500);
-            }, 2000); // Tampil selama 3 detik
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
         }
-    };
-</SCript>
+    }, 5000);
+</script>
+
 
 @endsection

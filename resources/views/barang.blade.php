@@ -10,6 +10,19 @@
     </h4>
 </div>
 
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="autoAlert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="autoAlert">
+        {{ $errors->first() }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 <div class="row">
     {{-- FORM TAMBAH --}}
     <div class="col-md-4">
@@ -18,47 +31,72 @@
                 Tambah Produk Baru
             </div>
             <div class="card-body">
-                <form id="formTambah">
+                <form id="formTambah"
+                      action="{{ route('barang.store') }}"
+                      method="POST">
+                    @csrf
+
                     <div class="mb-2">
                         <label class="form-label">Nama Barang</label>
-                        <input type="text" class="form-control" placeholder="Contoh Baju Kaos Merah All size">
+                        <input type="text"
+                               name="nama_barang"
+                               class="form-control"
+                               placeholder="Contoh Baju Kaos Merah All size">
                     </div>
-                    {{-- INPUT KATEGORI BARU --}}
+
+                    {{-- INPUT KATEGORI --}}
                     <div class="mb-2">
                         <label class="form-label">Kategori</label>
-                        <select class="form-select">
+                        <select name="id_kategori" class="form-select">
                             <option value="">Pilih Kategori</option>
-                            <option value="Alat Dapur">Alat Dapur</option>
-                            <option value="Kebersihan">Kebersihan</option>
-                            <option value="Elektronik">Elektronik</option>
-                            <option value="Lainnya">Lainnya</option>
+                            @foreach ($kategori as $kat)
+                                <option value="{{ $kat->id }}">{{ $kat->Nama_Kategori }}</option>
+                            @endforeach
                         </select>
                     </div>
+
                     <div class="mb-2">
                         <label class="form-label">Harga Beli (Modal)</label>
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
-                            <input type="text" class="form-control input-rupiah" placeholder="0">
+                            <input type="text"
+                                   name="harga_beli"
+                                   class="form-control input-rupiah"
+                                   placeholder="0">
                         </div>
                     </div>
+
                     <div class="mb-2">
                         <label class="form-label">Harga Jual</label>
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
-                            <input type="text" class="form-control input-rupiah" placeholder="0">
+                            <input type="text"
+                                   name="harga_jual"
+                                   class="form-control input-rupiah"
+                                   placeholder="0">
                         </div>
                     </div>
+
                     <div class="row mb-2">
                         <div class="col">
                             <label class="form-label">Stok</label>
-                            <input type="number" class="form-control" placeholder="0">
+                            <input type="number"
+                                   name="jumlah"
+                                   class="form-control"
+                                   placeholder="0">
                         </div>
                         <div class="col">
                             <label class="form-label text-danger">Min. Stok</label>
-                            <input type="number" class="form-control border-danger" placeholder="0">
+                            <input type="number"
+                                   name="min_stok"
+                                   class="form-control border-danger"
+                                   placeholder="0">
                         </div>
                     </div>
-                    <button type="button" class="btn w-100 text-white shadow-sm" style="background:#1F447A;" onclick="alert('Simulasi: Data berhasil disimpan!')">
+
+                    <button type="submit"
+                            class="btn w-100 text-white shadow-sm"
+                            style="background:#1F447A;">
                         <i class="bi bi-save"></i> Simpan Produk
                     </button>
                 </form>
@@ -87,40 +125,45 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- Baris Dummy 1 --}}
-                            <tr>
-                                <td>1</td>
-                                <td class="text-start"><strong>Kaos Merah all Size</strong></td>
-                                <td><span>Fashion</span></td>
-                                <td>15</td>
-                                <td>150.000</td>
-                                <td>185.000</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning" onclick="setEdit('1', 'Panci Set Jumbo Aulia', '150000', '185000', 'Alat Dapur', '15', '5')" data-bs-toggle="modal" data-bs-target="#editModal">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger" onclick="return confirm('Hapus barang?')">
+
+                        @foreach ($barang as $item)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td class="text-start"><strong>{{ $item->nama_barang }}</strong></td>
+                            <td><span>{{ $item->kategori->Nama_Kategori }}</span></td>
+                            <td>{{ $item->jumlah }}</td>
+                            <td>{{ number_format($item->harga_beli,0,',','.') }}</td>
+                            <td>{{ number_format($item->harga_jual,0,',','.') }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning"
+                                    onclick="setEdit(
+                                        '{{ $item->id }}',
+                                        '{{ $item->nama_barang }}',
+                                        '{{ $item->harga_beli }}',
+                                        '{{ $item->harga_jual }}',
+                                        '{{ $item->id_kategori }}',
+                                        '{{ $item->jumlah }}',
+                                        '{{ $item->min_stok }}'
+                                    )"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
+                                <form action="{{ route('barang.destroy', $item->id) }}"
+                                      method="POST"
+                                      class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Hapus barang?')">
                                         <i class="bi bi-trash"></i>
                                     </button>
-                                </td>
-                            </tr>
-                            {{-- Baris Dummy 2 --}}
-                            <tr>
-                                <td>2</td>
-                                <td class="text-start"><strong>Kaos Merah size L</strong></td>
-                                <td><span>Fashion</span></td>
-                                <td><span>2</span></td>
-                                <td>20.000</td>
-                                <td>35.000</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning" onclick="setEdit('2', 'Sapu Ijuk Super', '20000', '35000', 'Kebersihan', '2', '10')" data-bs-toggle="modal" data-bs-target="#editModal">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger" onclick="return confirm('Hapus barang?')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+
                         </tbody>
                     </table>
                 </div>
@@ -129,86 +172,143 @@
     </div>
 </div>
 
-{{-- MODAL EDIT --}}
+{{-- MODAL EDIT (STOK + Rp TETAP ADA) --}}
 <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content border-0">
-            <div class="modal-header text-white" style="background:#1F447A;">
-                <h5 class="modal-title">Edit Produk (Demo)</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <form id="formEdit" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="modal-content border-0">
+                <div class="modal-header text-white" style="background:#1F447A;">
+                    <h5 class="modal-title">Edit Produk (Demo)</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editId">
+
+                    <div class="mb-2">
+                        <label class="form-label">Nama Barang</label>
+                        <input type="text" name="nama_barang" id="editNama" class="form-control">
+                    </div>
+
+                    {{-- EDIT KATEGORI --}}
+                    <div class="mb-2">
+                        <label class="form-label">Kategori</label>
+                        <select name="id_kategori" id="editKategori" class="form-select">
+                            @foreach ($kategori as $kat)
+                                <option value="{{ $kat->id }}">{{ $kat->Nama_Kategori }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- HARGA BELI (READONLY, Rp ADA) --}}
+                    <div class="mb-2">
+                        <label class="form-label">Harga Beli (Modal)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">Rp</span>
+                            <input type="text" id="editBeli" class="form-control bg-light" readonly>
+                        </div>
+                    </div>
+
+                    {{-- HARGA JUAL (Rp ADA) --}}
+                    <div class="mb-2">
+                        <label class="form-label">Harga Jual</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="text" name="harga_jual" id="editJual" class="form-control input-rupiah">
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col">
+                            <label class="form-label">Stok</label>
+                            <input type="number" id="editStok" class="form-control bg-light" readonly>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Min. Stok</label>
+                            <input type="number" name="min_stok" id="editMinStok" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn text-white" style="background:#1F447A;">
+                        Simpan Perubahan
+                    </button>
+                </div>
             </div>
-            <div class="modal-body">
-                <input type="hidden" id="editId">
-                <div class="mb-2">
-                    <label class="form-label">Nama Barang</label>
-                    <input type="text" id="editNama" class="form-control">
-                </div>
-                {{-- EDIT KATEGORI --}}
-                <div class="mb-2">
-                    <label class="form-label">Kategori</label>
-                    <select id="editKategori" class="form-select">
-                        <option value="Alat Dapur">Alat Dapur</option>
-                        <option value="Kebersihan">Kebersihan</option>
-                        <option value="Elektronik">Elektronik</option>
-                        <option value="Lainnya">Lainnya</option>
-                    </select>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Harga Beli (Modal) <small class="text-muted">(Read-only)</small></label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light">Rp</span>
-                        <input type="text" id="editBeli" class="form-control bg-light" readonly>
-                    </div>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Harga Jual</label>
-                    <div class="input-group">
-                        <span class="input-group-text">Rp</span>
-                        <input type="text" id="editJual" class="form-control input-rupiah">
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col">
-                        <label class="form-label">Stok</label>
-                        <input type="number" id="editStok" class="form-control bg-light" readonly>
-                    </div>
-                    <div class="col">
-                        <label class="form-label">Min. Stok</label>
-                        <input type="number" id="editMinStok" class="form-control">
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn text-white" style="background:#1F447A;" onclick="alert('Simulasi: Perubahan berhasil disimpan!')" data-bs-dismiss="modal">Simpan Perubahan</button>
-            </div>
-        </div>
+        </form>
     </div>
 </div>
 
 <script>
-    function formatNumber(n) {
-        if (!n) return "";
-        let val = n.toString().replace(/\D/g, "");
-        return val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
+/* ===============================
+   HELPER RUPIAH
+================================ */
 
-    // Update parameter untuk menerima kategori
-    function setEdit(id, nama, beli, jual, kategori, stok, min) {
-        document.getElementById('editId').value = id;
-        document.getElementById('editNama').value = nama;
-        document.getElementById('editBeli').value = formatNumber(beli);
-        document.getElementById('editJual').value = formatNumber(jual);
-        document.getElementById('editKategori').value = kategori; // Set kategori di modal
-        document.getElementById('editStok').value = stok;
-        document.getElementById('editMinStok').value = min;
-    }
+/* Rp 150.000 → 150000 */
+function rupiahToNumber(value) {
+    if (!value) return 0;
+    return parseInt(value.toString().replace(/\D/g, ''), 10);
+}
 
-    document.addEventListener('input', function (e) {
-        if (e.target.classList.contains('input-rupiah')) {
-            e.target.value = formatNumber(e.target.value);
+/* 150000 → 150.000 */
+function numberToRupiah(number) {
+    if (!number) return "";
+    // 🔥 PENTING: paksa ke integer → .00 hilang
+    number = parseInt(number, 10);
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+/* ===============================
+   SET DATA KE MODAL EDIT
+================================ */
+function setEdit(id, nama, beli, jual, kategori, stok, min) {
+    document.getElementById('editNama').value = nama;
+
+    // harga dari DB (ANGKA), diformat SEKALI
+    document.getElementById('editBeli').value = numberToRupiah(beli);
+    document.getElementById('editJual').value = numberToRupiah(jual);
+
+    document.getElementById('editKategori').value = kategori;
+    document.getElementById('editStok').value = stok; // stok = jumlah
+    document.getElementById('editMinStok').value = min;
+
+    document.getElementById('formEdit').action = '/barang/' + id;
+}
+
+/* ===============================
+   FORMAT SAAT USER MENGETIK
+================================ */
+document.addEventListener('input', function (e) {
+    if (e.target.classList.contains('input-rupiah')) {
+        e.target.value = numberToRupiah(
+            rupiahToNumber(e.target.value)
+        );
+    }
+});
+
+/* ===============================
+   SEBELUM SUBMIT (WAJIB)
+================================ */
+document.getElementById('formTambah').addEventListener('submit', function () {
+    this.harga_beli.value = rupiahToNumber(this.harga_beli.value);
+    this.harga_jual.value = rupiahToNumber(this.harga_jual.value);
+});
+
+document.getElementById('formEdit').addEventListener('submit', function () {
+    this.harga_jual.value = rupiahToNumber(this.harga_jual.value);
+});
+
+ setTimeout(function () {
+        const alert = document.getElementById('autoAlert');
+        if (alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
         }
-    });
+    }, 5000);
 </script>
+
 
 @endsection

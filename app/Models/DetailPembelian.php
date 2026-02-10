@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Kategori extends Model
+class DetailPembelian extends Model
 {
-    protected $table = 'Kategori';
+    protected $table = 'detail_pembelian';
 
     protected $primaryKey = 'id';
     public $incrementing = false;
@@ -16,8 +16,11 @@ class Kategori extends Model
 
     protected $fillable = [
         'id',
-        'Nama_Kategori',
-        'status'
+        'id_data_barang',
+        'id_pembelian',
+        'jumlah',
+        'harga_beli_baru',
+        'sub_total_pembelian'
     ];
 
     protected static function boot()
@@ -29,5 +32,15 @@ class Kategori extends Model
                 $model->id = (string) Str::uuid();
             }
         });
+    }
+
+    public function barang()
+    {
+        return $this->belongsTo(DataBarang::class, 'id_data_barang');
+    }
+
+    public function pembelian()
+    {
+        return $this->belongsTo(Pembelian::class, 'id_pembelian');
     }
 }

@@ -1,12 +1,12 @@
 @extends('template')
 
-@section('title','Restok Barang')
+@section('title','Pembelian')
 
 @section('content')
 
 <div class="mb-4 p-3 text-white rounded shadow-sm d-flex justify-content-between align-items-center" style="background:#1F447A;">
     <h4 class="mb-0">
-        <i class="bi bi-arrow-repeat"></i> Barang Perlu Restok
+        <i class="bi bi-arrow-repeat"></i> Pembelian barang dan Restock
     </h4>
 </div>
 

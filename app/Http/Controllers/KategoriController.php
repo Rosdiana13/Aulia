@@ -2,68 +2,79 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kategori;
 use Illuminate\Http\Request;
-use App\Models\Kategori; // Pastikan Model Kategori sudah dibuat
-use Illuminate\Support\Str; // Alat untuk membuat UUID otomatis
 
 class KategoriController extends Controller
 {
-    /**
-     * Menampilkan halaman kategori dan daftar datanya.
-     */
     public function index()
     {
-        // Mengambil semua data kategori dari database
-        $kategori = Kategori::all();
-        
-        // Mengirim data ke view kategori.blade.php
+        // Hanya tampilkan kategori yang masih aktif
+        $kategori = Kategori::where('status', 1)->get();
         return view('kategori', compact('kategori'));
     }
 
-    /**
-     * Menyimpan kategori baru ke database.
-     */
-    public function store(Request $request)
+   public function store(Request $request)
     {
-        // 1. Ubah input user jadi huruf kecil semua
-        $inputNama = strtolower($request->Nama_Kategori);
-
-        // 2. Cek di database dengan merubah isi kolom Nama_Kategori jadi kecil semua juga
-        $cekDuplikat = Kategori::whereRaw('LOWER(Nama_Kategori) = ?', [$inputNama])->exists();
-
-        if ($cekDuplikat) {
-            // Jika kedeteksi sama, balikkan pesan error
-            return redirect()->back()->with('error', "Kategori '$request->Nama_Kategori' sudah ada!");
-        }
-
-        // 3. Jika benar-benar baru, baru simpan
-        Kategori::create([
-            'id' => (string) \Illuminate\Support\Str::uuid(),
-            'Nama_Kategori' => $request->Nama_Kategori,
+        $request->validate([
+            'Nama_Kategori' => 'required|max:100'
         ]);
 
-        return redirect()->back()->with('success', 'Kategori berhasil ditambah!');
-    }
+        // Cek apakah kategori sudah pernah ada
+        $kategori = Kategori::where('Nama_Kategori', $request->Nama_Kategori)->first();
 
-    /**
-     * Menghapus kategori berdasarkan ID.
-     */
-    public function destroy($id)
-    {
-        // 1. Cari kategori berdasarkan ID
-        $kategori = Kategori::findOrFail($id);
+        // Jika ADA dan status = 0 → AKTIFKAN KEMBALI
+        if ($kategori && $kategori->status == 0) {
+            $kategori->update([
+                'status' => 1
+            ]);
 
-        // 2. Cek apakah ada barang yang terhubung (menggunakan relasi barang() di Model)
-        if ($kategori->barang()->exists()) {
-            // Jika ada, kirim pesan error dan batalkan penghapusan
-            return redirect()->back()->with('error', 
-                "Gagal menghapus! Kategori '{$kategori->Nama_Kategori}' masih memiliki data barang di dalamnya. Hapus atau pindahkan data barang terlebih dahulu."
-            );
+            return redirect()->back()
+                ->with('success', 'Kategori berhasil diaktifkan kembali');
         }
 
-        // 3. Jika tidak ada relasi, hapus kategori
-        $kategori->delete();
+        // Jika ADA dan status = 1 → TOLAK
+        if ($kategori && $kategori->status == 1) {
+            return redirect()->back()
+                ->withErrors(['Kategori sudah ada dan masih aktif']);
+        }
 
-        return redirect()->back()->with('success', 'Kategori berhasil dihapus!');
+        // Jika BELUM ADA → BUAT BARU
+        Kategori::create([
+            'Nama_Kategori' => $request->Nama_Kategori,
+            'status'        => 1
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Kategori berhasil ditambahkan');
+    }
+
+
+    public function update(Request $request, $id)
+    {
+        // Saat update: abaikan ID sendiri, tetap cek status aktif
+        $request->validate([
+            'Nama_Kategori' => 'required|max:100|unique:Kategori,Nama_Kategori,' . $id . ',id,status,1'
+        ], [
+            'Nama_Kategori.unique' => 'Kategori sudah ada dan masih aktif'
+        ]);
+
+        $kategori = Kategori::findOrFail($id);
+        $kategori->update([
+            'Nama_Kategori' => $request->Nama_Kategori
+        ]);
+
+        return redirect()->back()->with('success', 'Kategori berhasil diperbarui');
+    }
+
+    public function destroy($id)
+    {
+        // Soft delete manual: ubah status, bukan hapus data
+        $kategori = Kategori::findOrFail($id);
+        $kategori->update([
+            'status' => 0
+        ]);
+
+        return redirect()->back()->with('success', 'Kategori berhasil dinonaktifkan');
     }
 }
