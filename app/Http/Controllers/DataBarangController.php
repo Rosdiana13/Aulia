@@ -22,11 +22,8 @@ class DataBarangController extends Controller
         return view('barang', compact('barang', 'kategori'));
     }
 
-    /**
-     * BARANG MASUK PERTAMA KALI
-     * Dicatat sebagai pembelian
-     */
-    public function store(Request $request)
+    /** BARANG MASUK PERTAMA KALI Dicatat sebagai pembelian **/
+   public function store(Request $request)
     {
         $request->validate([
             'nama_barang' => 'required|max:200',
@@ -37,25 +34,55 @@ class DataBarangController extends Controller
             'min_stok'    => 'required|numeric|min:0'
         ]);
 
-        DB::transaction(function () use ($request) {
+        $pesan = 'Barang berhasil ditambahkan dan pembelian dicatat';
 
-            // 1️⃣ PEMBELIAN (HEADER)
+        DB::transaction(function () use ($request, &$pesan) {
+
+            $nama = trim(strtolower($request->nama_barang));
+
+            // CARI TANPA PEDULI HURUF BESAR KECIL & SPA SI
+            $barang = DataBarang::whereRaw('LOWER(TRIM(nama_barang)) = ?', [$nama])
+                ->where('id_kategori', $request->id_kategori)
+                ->first();
+
+            // PEMBELIAN
             $pembelian = Pembelian::create([
-                'id_pengguna'     => auth()->user()->id, // WAJIB LOGIN
+                'id_pengguna'     => auth()->user()->id,
                 'total_pembelian' => 0
             ]);
 
-            // 2️⃣ CEK BARANG SUDAH ADA ATAU BELUM
-            $barang = DataBarang::where('nama_barang', $request->nama_barang)
-                ->where('id_kategori', $request->id_kategori)
-                ->where('status', 1)
-                ->first();
+            if ($barang) {
 
-            // JIKA BELUM ADA → BUAT BARU
-            if (!$barang) {
+                // JIKA STATUS 0 → AKTIFKAN KEMBALI
+                if ($barang->status == 0) {
+
+                    $barang->update([
+                        'status'     => 1,
+                        'jumlah'     => $request->jumlah,
+                        'harga_beli' => $request->harga_beli,
+                        'harga_jual' => $request->harga_jual,
+                        'min_stok'   => $request->min_stok
+                    ]);
+
+                    $pesan = 'Barang diaktifkan kembali dan pembelian dicatat';
+                }
+
+                // JIKA SUDAH AKTIF → TAMBAH STOK
+                else {
+
+                    $barang->update([
+                        'jumlah'     => $barang->jumlah + $request->jumlah,
+                        'harga_beli' => $request->harga_beli
+                    ]);
+                }
+            }
+
+            // JIKA BENAR-BENAR BELUM ADA
+            else {
+
                 $barang = DataBarang::create([
                     'id_kategori' => $request->id_kategori,
-                    'nama_barang' => $request->nama_barang,
+                    'nama_barang' => trim($request->nama_barang),
                     'harga_beli'  => $request->harga_beli,
                     'harga_jual'  => $request->harga_jual,
                     'jumlah'      => $request->jumlah,
@@ -63,17 +90,10 @@ class DataBarangController extends Controller
                     'status'      => 1
                 ]);
             }
-            // JIKA SUDAH ADA → TAMBAH STOK
-            else {
-                $barang->update([
-                    'jumlah'     => $barang->jumlah + $request->jumlah,
-                    'harga_beli' => $request->harga_beli
-                ]);
-            }
 
             $subtotal = $request->jumlah * $request->harga_beli;
 
-            // 3️⃣ DETAIL PEMBELIAN
+            // DETAIL PEMBELIAN
             DetailPembelian::create([
                 'id_data_barang'      => $barang->id,
                 'id_pembelian'        => $pembelian->id,
@@ -82,20 +102,15 @@ class DataBarangController extends Controller
                 'sub_total_pembelian' => $subtotal
             ]);
 
-            // 4️⃣ UPDATE TOTAL PEMBELIAN
+            // UPDATE TOTAL
             $pembelian->update([
                 'total_pembelian' => $subtotal
             ]);
         });
 
-        return redirect()->back()
-            ->with('success', 'Barang berhasil ditambahkan dan pembelian dicatat');
+        return redirect()->back()->with('success', $pesan);
     }
 
-    /**
-     * EDIT DATA BARANG
-     * (tanpa ubah stok)
-     */
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -116,9 +131,6 @@ class DataBarangController extends Controller
         return redirect()->back()->with('success', 'Data barang berhasil diperbarui');
     }
 
-    /**
-     * NONAKTIFKAN BARANG
-     */
     public function destroy($id)
     {
         $barang = DataBarang::findOrFail($id);
@@ -126,6 +138,6 @@ class DataBarangController extends Controller
             'status' => 0
         ]);
 
-        return redirect()->back()->with('success', 'Barang berhasil dinonaktifkan');
+        return redirect()->back()->with('success', 'Barang berhasil dihapus');
     }
 }
