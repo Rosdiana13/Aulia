@@ -6,22 +6,31 @@
 
 <div class="mb-4 p-3 text-white rounded shadow-sm" style="background:#1F447A;">
     <h4 class="mb-0">
-        <i class="bi bi-box"></i> Manajemen Data Barang (Demo Mode)
+        <i class="bi bi-box"></i> Manajemen Data Barang
     </h4>
 </div>
 
 @if (session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert" id="autoAlert">
         {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 @endif
+
+@if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="autoAlert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
 @if ($errors->any())
     <div class="alert alert-danger alert-dismissible fade show" role="alert" id="autoAlert">
         {{ $errors->first() }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 @endif
+
 
 <div class="row">
     {{-- FORM TAMBAH --}}
@@ -126,45 +135,54 @@
                         </thead>
                         <tbody>
 
-                        @foreach ($barang as $item)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td class="text-start"><strong>{{ $item->nama_barang }}</strong></td>
-                            <td><span>{{ $item->kategori->Nama_Kategori }}</span></td>
-                            <td>{{ $item->jumlah }}</td>
-                            <td>{{ number_format($item->harga_beli,0,',','.') }}</td>
-                            <td>{{ number_format($item->harga_jual,0,',','.') }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning"
-                                    onclick="setEdit(
-                                        '{{ $item->id }}',
-                                        '{{ $item->nama_barang }}',
-                                        '{{ $item->harga_beli }}',
-                                        '{{ $item->harga_jual }}',
-                                        '{{ $item->id_kategori }}',
-                                        '{{ $item->jumlah }}',
-                                        '{{ $item->min_stok }}'
-                                    )"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#editModal">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-
-                                <form action="{{ route('barang.destroy', $item->id) }}"
-                                      method="POST"
-                                      class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Hapus barang?')">
-                                        <i class="bi bi-trash"></i>
+                            @forelse ($barang as $item)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td class="text-start"><strong>{{ $item->nama_barang }}</strong></td>
+                                <td><span>{{ $item->kategori->Nama_Kategori }}</span></td>
+                                <td>{{ $item->jumlah }}</td>
+                                <td>{{ number_format($item->harga_beli,0,',','.') }}</td>
+                                <td>{{ number_format($item->harga_jual,0,',','.') }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning"
+                                        onclick="setEdit(
+                                            '{{ $item->id }}',
+                                            '{{ $item->nama_barang }}',
+                                            '{{ $item->harga_beli }}',
+                                            '{{ $item->harga_jual }}',
+                                            '{{ $item->id_kategori }}',
+                                            '{{ $item->jumlah }}',
+                                            '{{ $item->min_stok }}'
+                                        )"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal">
+                                        <i class="bi bi-pencil-square"></i>
                                     </button>
-                                </form>
-                            </td>
-                        </tr>
-                        @endforeach
 
-                        </tbody>
+                                    <form action="{{ route('barang.destroy', $item->id) }}"
+                                        method="POST"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Hapus barang?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+
+                            @empty
+                            <tr>
+                                <td colspan="7">
+                                    <div class="p-5 text-center text-muted">
+                                        Belum ada barang dalam daftar
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+
+                            </tbody>
                     </table>
                 </div>
             </div>

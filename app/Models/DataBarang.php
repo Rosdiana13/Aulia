@@ -40,4 +40,10 @@ class DataBarang extends Model
     {
         return $this->belongsTo(Kategori::class, 'id_kategori');
     }
+
+    public function detailPenjualan()
+    {
+        return $this->hasMany(DetailPenjualan::class, 'id_data_barang');
+    }
+
 }

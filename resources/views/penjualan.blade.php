@@ -4,7 +4,7 @@
 
 @section('content')
 
-<form action="#" method="POST">
+<form action="{{ route('penjualan.store') }}" method="POST" id="form-penjualan">
 @csrf
 
 <!-- HEADER -->
@@ -16,6 +16,27 @@
         <span class="badge bg-light text-dark">{{ date('d M Y') }}</span>
     </div>
 </div>
+
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="autoAlert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+@if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="autoAlert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="autoAlert">
+        {{ $errors->first() }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
 
 <div class="row">
     <!-- INPUT -->
@@ -29,11 +50,13 @@
                     <label class="form-label">Pilih Produk</label>
                     <select id="pilih-barang" class="form-select">
                         <option value="">-- Pilih Barang --</option>
-                        <option value="BRG001" data-nama="Kaos Aulia" data-harga="50000">Kaos Aulia</option>
-                        <option value="BRG002" data-nama="Jilbab Syari" data-harga="75000">Jilbab Syari</option>
-                        <option value="BRG003" data-nama="Gamis Katun" data-harga="120000">Gamis Katun</option>
-                        <option value="BRG004" data-nama="Sepatu Sneakers" data-harga="275000">Sepatu Sneakers</option>
-                        <option value="BRG005" data-nama="Tas Selempang" data-harga="185000">Tas Selempang</option>
+                        @foreach($barang as $item)
+                            <option value="{{ $item->id }}"
+                                data-nama="{{ $item->nama_barang }}"
+                                data-harga="{{ $item->harga_jual }}">
+                                {{ $item->nama_barang }} 
+                            </option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -86,13 +109,16 @@
                     </h3>
                 </div>
 
-                <button type="button" class="btn btn-success btn-lg px-5" disabled>
-                    <i class="bi bi-check-circle"></i> Simpan (Dummy)
+                <button type="submit" id="btn-simpan" class="btn btn-success btn-lg px-5" disabled>
+                    <i class="bi bi-check-circle"></i> Simpan
                 </button>
             </div>
         </div>
     </div>
 </div>
+
+<input type="hidden" name="items" id="input-items">
+
 </form>
 
 <script>
@@ -113,6 +139,7 @@ function tambahKeKeranjang() {
     const harga = parseInt(opt.dataset.harga);
 
     const index = keranjang.findIndex(item => item.id === id);
+
     if (index > -1) {
         keranjang[index].qty += qty;
     } else {
@@ -125,17 +152,20 @@ function tambahKeKeranjang() {
 function renderTabel() {
     const tbody = document.getElementById('isi-keranjang');
     const kosong = document.getElementById('pesan-kosong');
+    const btnSimpan = document.getElementById('btn-simpan');
 
     tbody.innerHTML = '';
     let total = 0;
 
     if (keranjang.length === 0) {
         kosong.classList.remove('d-none');
+        btnSimpan.disabled = true;
         document.getElementById('label-total').innerText = 0;
         return;
     }
 
     kosong.classList.add('d-none');
+    btnSimpan.disabled = false;
 
     keranjang.forEach((item, index) => {
         const subtotal = item.qty * item.harga;
@@ -174,6 +204,19 @@ function hapusItem(index) {
     keranjang.splice(index, 1);
     renderTabel();
 }
+
+// Kirim data ke controller
+document.getElementById('form-penjualan').addEventListener('submit', function () {
+    document.getElementById('input-items').value = JSON.stringify(keranjang);
+});
+
+setTimeout(function () {
+    const alert = document.getElementById('autoAlert');
+    if (alert) {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    }
+}, 5000);
 </script>
 
 @endsection

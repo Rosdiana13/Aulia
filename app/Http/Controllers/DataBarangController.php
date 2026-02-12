@@ -22,7 +22,6 @@ class DataBarangController extends Controller
         return view('barang', compact('barang', 'kategori'));
     }
 
-    /** BARANG MASUK PERTAMA KALI Dicatat sebagai pembelian **/
    public function store(Request $request)
     {
         $request->validate([
@@ -34,82 +33,26 @@ class DataBarangController extends Controller
             'min_stok'    => 'required|numeric|min:0'
         ]);
 
-        $pesan = 'Barang berhasil ditambahkan dan pembelian dicatat';
+        try {
 
-        DB::transaction(function () use ($request, &$pesan) {
-
-            $nama = trim(strtolower($request->nama_barang));
-
-            // CARI TANPA PEDULI HURUF BESAR KECIL & SPA SI
-            $barang = DataBarang::whereRaw('LOWER(TRIM(nama_barang)) = ?', [$nama])
-                ->where('id_kategori', $request->id_kategori)
-                ->first();
-
-            // PEMBELIAN
-            $pembelian = Pembelian::create([
-                'id_pengguna'     => auth()->user()->id,
-                'total_pembelian' => 0
+            DB::statement('CALL sp_store_barang(?, ?, ?, ?, ?, ?, ?)', [
+                auth()->user()->id,
+                $request->id_kategori,
+                $request->nama_barang,
+                $request->harga_beli,
+                $request->harga_jual,
+                $request->jumlah,
+                $request->min_stok
             ]);
 
-            if ($barang) {
+            return redirect()->back()->with('success', 'Barang berhasil diproses');
 
-                // JIKA STATUS 0 → AKTIFKAN KEMBALI
-                if ($barang->status == 0) {
+        } catch (\Exception $e) {
 
-                    $barang->update([
-                        'status'     => 1,
-                        'jumlah'     => $request->jumlah,
-                        'harga_beli' => $request->harga_beli,
-                        'harga_jual' => $request->harga_jual,
-                        'min_stok'   => $request->min_stok
-                    ]);
-
-                    $pesan = 'Barang diaktifkan kembali dan pembelian dicatat';
-                }
-
-                // JIKA SUDAH AKTIF → TAMBAH STOK
-                else {
-
-                    $barang->update([
-                        'jumlah'     => $barang->jumlah + $request->jumlah,
-                        'harga_beli' => $request->harga_beli
-                    ]);
-                }
-            }
-
-            // JIKA BENAR-BENAR BELUM ADA
-            else {
-
-                $barang = DataBarang::create([
-                    'id_kategori' => $request->id_kategori,
-                    'nama_barang' => trim($request->nama_barang),
-                    'harga_beli'  => $request->harga_beli,
-                    'harga_jual'  => $request->harga_jual,
-                    'jumlah'      => $request->jumlah,
-                    'min_stok'    => $request->min_stok,
-                    'status'      => 1
-                ]);
-            }
-
-            $subtotal = $request->jumlah * $request->harga_beli;
-
-            // DETAIL PEMBELIAN
-            DetailPembelian::create([
-                'id_data_barang'      => $barang->id,
-                'id_pembelian'        => $pembelian->id,
-                'jumlah'              => $request->jumlah,
-                'harga_beli_baru'     => $request->harga_beli,
-                'sub_total_pembelian' => $subtotal
-            ]);
-
-            // UPDATE TOTAL
-            $pembelian->update([
-                'total_pembelian' => $subtotal
-            ]);
-        });
-
-        return redirect()->back()->with('success', $pesan);
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
+
 
     public function update(Request $request, $id)
     {
@@ -120,24 +63,37 @@ class DataBarangController extends Controller
             'min_stok'    => 'required|numeric|min:0'
         ]);
 
-        $barang = DataBarang::findOrFail($id);
-        $barang->update([
-            'nama_barang' => $request->nama_barang,
-            'id_kategori' => $request->id_kategori,
-            'harga_jual'  => $request->harga_jual,
-            'min_stok'    => $request->min_stok
-        ]);
+        try {
 
-        return redirect()->back()->with('success', 'Data barang berhasil diperbarui');
+            DB::statement('CALL sp_update_barang(?, ?, ?, ?, ?)', [
+                $id,
+                $request->nama_barang,
+                $request->id_kategori,
+                $request->harga_jual,
+                $request->min_stok
+            ]);
+
+            return redirect()->back()->with('success', 'Data barang berhasil diperbarui');
+
+        } catch (\Exception $e) {
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
-    public function destroy($id)
+  public function destroy($id)
     {
-        $barang = DataBarang::findOrFail($id);
-        $barang->update([
-            'status' => 0
-        ]);
+        try {
 
-        return redirect()->back()->with('success', 'Barang berhasil dihapus');
+            DB::statement('CALL sp_soft_delete_barang(?)', [$id]);
+
+            return redirect()->back()->with('success', 'Barang berhasil dihapus');
+
+        } catch (\Exception $e) {
+
+            $message = $e->errorInfo[2] ?? 'Terjadi kesalahan';
+
+            return redirect()->back()->with('error', $message);
+        }
     }
 }

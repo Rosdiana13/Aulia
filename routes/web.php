@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\DataBarangController;
+use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\DashboardController;
+
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -19,9 +22,9 @@ Route::controller(AuthController::class)->group(function () {
 // Protected
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    // dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard');
 
     // BARANG
     Route::get('/barang', [DataBarangController::class, 'index'])->name('barang.index');
@@ -35,8 +38,12 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/kategori/{id}', [KategoriController::class, 'update'])->name('kategori.update');
     Route::delete('/kategori/{id}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
 
+    // PENJUALAN
+    Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
+    Route::post('/penjualan', [PenjualanController::class, 'store'])->name('penjualan.store');
+
+
     // LAINNYA
-    Route::view('/penjualan', 'penjualan')->name('penjualan.index');
     Route::view('/pembelian', 'pembelian')->name('pembelian.index');
     Route::view('/deadstock', 'deadstock')->name('deadstock.index');
     Route::view('/penyesuaian', 'penyesuaian')->name('penyesuaian.index');
