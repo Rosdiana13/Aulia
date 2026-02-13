@@ -118,6 +118,15 @@
         <div class="card shadow-sm border-0">
             <div class="card-header text-white d-flex justify-content-between align-items-center" style="background:#1F447A;">
                 <span>Daftar Produk</span>
+
+                 <div class="col-md-4">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Cari nama barang...">
+                    </div>
+                </div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -133,7 +142,7 @@
                                 <th>Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tableBody">
 
                             @forelse ($barang as $item)
                             <tr>
@@ -261,44 +270,50 @@
 </div>
 
 <script>
-/* ===============================
-   HELPER RUPIAH
-================================ */
 
-/* Rp 150.000 → 150000 */
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const rows = document.querySelectorAll('#tableBody tr');
+
+    searchInput?.addEventListener('keyup', function () {
+        const filter = this.value.toLowerCase();
+
+        rows.forEach(row => {
+            row.style.display = row.textContent
+                .toLowerCase()
+                .includes(filter) ? '' : 'none';
+        });
+    });
+
+});
+
 function rupiahToNumber(value) {
     if (!value) return 0;
     return parseInt(value.toString().replace(/\D/g, ''), 10);
 }
 
-/* 150000 → 150.000 */
+
 function numberToRupiah(number) {
     if (!number) return "";
-    // 🔥 PENTING: paksa ke integer → .00 hilang
     number = parseInt(number, 10);
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
-/* ===============================
-   SET DATA KE MODAL EDIT
-================================ */
+
 function setEdit(id, nama, beli, jual, kategori, stok, min) {
     document.getElementById('editNama').value = nama;
 
-    // harga dari DB (ANGKA), diformat SEKALI
     document.getElementById('editBeli').value = numberToRupiah(beli);
     document.getElementById('editJual').value = numberToRupiah(jual);
 
     document.getElementById('editKategori').value = kategori;
-    document.getElementById('editStok').value = stok; // stok = jumlah
+    document.getElementById('editStok').value = stok; 
     document.getElementById('editMinStok').value = min;
 
     document.getElementById('formEdit').action = '/barang/' + id;
 }
 
-/* ===============================
-   FORMAT SAAT USER MENGETIK
-================================ */
+
 document.addEventListener('input', function (e) {
     if (e.target.classList.contains('input-rupiah')) {
         e.target.value = numberToRupiah(
@@ -307,9 +322,7 @@ document.addEventListener('input', function (e) {
     }
 });
 
-/* ===============================
-   SEBELUM SUBMIT (WAJIB)
-================================ */
+
 document.getElementById('formTambah').addEventListener('submit', function () {
     this.harga_beli.value = rupiahToNumber(this.harga_beli.value);
     this.harga_jual.value = rupiahToNumber(this.harga_jual.value);

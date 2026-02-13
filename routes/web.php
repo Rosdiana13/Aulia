@@ -6,6 +6,8 @@ use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\DataBarangController;
 use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PembelianController;
+
 
 
 Route::get('/', function () {
@@ -42,10 +44,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
     Route::post('/penjualan', [PenjualanController::class, 'store'])->name('penjualan.store');
 
+    // Pembelian
+    Route::get('/pembelian', [PembelianController::class, 'index'])->name('pembelian.index');
+    Route::post('/pembelian/restok', [PembelianController::class, 'restok'])->name('pembelian.restok');
 
     // LAINNYA
-    Route::view('/pembelian', 'pembelian')->name('pembelian.index');
     Route::view('/deadstock', 'deadstock')->name('deadstock.index');
-    Route::view('/penyesuaian', 'penyesuaian')->name('penyesuaian.index');
 
 });
