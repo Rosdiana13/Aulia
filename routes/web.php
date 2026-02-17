@@ -7,6 +7,7 @@ use App\Http\Controllers\DataBarangController;
 use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PembelianController;
+use App\Http\Controllers\DeadStockController;
 
 
 
@@ -48,7 +49,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pembelian', [PembelianController::class, 'index'])->name('pembelian.index');
     Route::post('/pembelian/restok', [PembelianController::class, 'restok'])->name('pembelian.restok');
 
-    // LAINNYA
-    Route::view('/deadstock', 'deadstock')->name('deadstock.index');
-
+    // Dead Stock
+    Route::get('/deadstock', [DeadStockController::class, 'index'])->name('deadstock.index');
 });

@@ -17,11 +17,11 @@
     </div>
 </div>
 
-{{-- Header khusus cetak --}}
+{{-- Header Cetak --}}
 <div class="d-none d-print-block text-center mb-4">
     <h4>LAPORAN IDENTIFIKASI STOK MATI (DEAD STOCK)</h4>
     <p>Parameter Batas: Tidak Terjual Selama
-        <strong>{{ request('days', 30) }} Hari</strong> atau Lebih
+        <strong>{{ $days }} Hari</strong> atau Lebih
     </p>
     <hr>
 </div>
@@ -40,7 +40,7 @@
                     </span>
                     <input type="number" name="days"
                            class="form-control border-danger"
-                           value="{{ request('days', 30) }}"
+                           value="{{ $days }}"
                            min="1">
                     <span class="input-group-text">Hari</span>
                     <button class="btn btn-danger">
@@ -48,7 +48,7 @@
                     </button>
                 </div>
                 <div class="form-text">
-                    Sistem menampilkan barang dengan lama mengendap ≥ {{ request('days', 30) }} hari.
+                    Sistem menampilkan barang dengan lama mengendap ≥ {{ $days }} hari.
                 </div>
             </div>
 
@@ -56,7 +56,7 @@
                 <div class="p-2 bg-light rounded border border-danger">
                     <small class="text-muted d-block">Kriteria Tampilan</small>
                     <span class="badge bg-danger">
-                        Dead Stock ≥ {{ request('days', 30) }} Hari
+                        Dead Stock ≥ {{ $days }} Hari
                     </span>
                 </div>
             </div>
@@ -64,7 +64,7 @@
     </div>
 </div>
 
-{{-- Tabel Dead Stock --}}
+{{-- Tabel --}}
 <div class="card shadow-sm border-0">
     <div class="card-header bg-white pt-3 pb-3">
         <div class="row align-items-center">
@@ -97,36 +97,32 @@
                         <th width="50">No</th>
                         <th class="text-start">Nama Barang</th>
                         <th>Kategori</th>
-                        <th>Stok Awal</th>
-                        <th>Tanggal Masuk / Pembelian</th>
+                        <th>Stok</th>
+                        <th>Tanggal Masuk</th>
                         <th>Lama Mengendap (Hari)</th>
                     </tr>
                 </thead>
                 <tbody id="isiLaporan">
+                    @forelse($deadstock as $item)
                     <tr>
-                        <td class="text-center">1</td>
-                        <td class="fw-bold">Kaos Polos Cotton Combed</td>
-                        <td class="text-center">Fesyen</td>
-                        <td class="text-center">50</td>
-                        <td class="text-center">05/09/2025</td>
-                        <td class="text-center text-danger fw-bold">120</td>
+                        <td class="text-center">{{ $loop->iteration }}</td>
+                        <td class="fw-bold">{{ $item->nama_barang }}</td>
+                        <td class="text-center">{{ $item->Nama_Kategori }}</td>
+                        <td class="text-center">{{ $item->stok }}</td>
+                        <td class="text-center">
+                            {{ \Carbon\Carbon::parse($item->tanggal_masuk)->format('d/m/Y') }}
+                        </td>
+                        <td class="text-center text-danger fw-bold">
+                            {{ $item->lama_mengendap }}
+                        </td>
                     </tr>
+                    @empty
                     <tr>
-                        <td class="text-center">2</td>
-                        <td class="fw-bold">Kemeja Lengan Panjang Pria</td>
-                        <td class="text-center">Fesyen</td>
-                        <td class="text-center">30</td>
-                        <td class="text-center">20/09/2025</td>
-                        <td class="text-center text-danger fw-bold">105</td>
+                        <td colspan="6" class="text-center text-muted p-4">
+                            Tidak ada dead stock dengan batas {{ $days }} hari
+                        </td>
                     </tr>
-                    <tr>
-                        <td class="text-center">3</td>
-                        <td class="fw-bold">Jaket Hoodie Wanita</td>
-                        <td class="text-center">Fesyen</td>
-                        <td class="text-center">25</td>
-                        <td class="text-center">01/10/2025</td>
-                        <td class="text-center text-danger fw-bold">95</td>
-                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

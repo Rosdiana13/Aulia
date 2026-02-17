@@ -35,22 +35,22 @@ class PembelianController extends Controller
 
             $barang = DataBarang::findOrFail($request->id_barang);
 
-            // 🔹 Tambah stok dulu
+            // Tambah stok dulu
             $barang->update([
                 'jumlah' => $barang->jumlah + $request->qty_masuk
             ]);
 
-            // 🔹 Hitung subtotal
+            // Hitung subtotal
             $subtotal = $request->qty_masuk * $request->harga_beli_baru;
 
-            // 🔹 Buat header pembelian
+            // Buat header pembelian
             $pembelian = Pembelian::create([
                 'id' => Str::uuid(),
                 'id_pengguna' => auth()->user()->id,
                 'total_pembelian' => 0 // nanti trigger update
             ]);
 
-            // 🔹 Insert detail pembelian
+            // Insert detail pembelian
             DetailPembelian::create([
                 'id' => Str::uuid(),
                 'id_data_barang' => $barang->id,
