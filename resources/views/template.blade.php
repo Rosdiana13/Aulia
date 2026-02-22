@@ -1,3 +1,12 @@
+@php
+    use Illuminate\Support\Facades\DB;
+
+    $jumlahRestok = DB::table('data_barang')
+        ->whereColumn('jumlah', '<=', 'min_stok')
+        ->where('status', 1)
+        ->count();
+@endphp
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -6,6 +15,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    
    
 
     <style>
@@ -49,6 +59,12 @@
         .logo img {
             max-height: 80px;
         }
+
+        .sidebar a.active {
+            background: #16355f;
+            font-weight: bold;
+            border-left: 4px solid #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -63,12 +79,41 @@
 
     <!-- Menu -->
     <div class="menu">
-        <a href="/dashboard"><i class="bi-house"></i> Dashboard</a>
-        <a href="/penjualan"><i class="bi bi-cash-stack"></i> Penjualan</a>
-        <a href="/barang"><i class="bi bi-box"></i> Barang</a>
-        <a href="/pembelian"><i class="bi bi-arrow-repeat"></i> Pembelian</a>
-        <a href="/deadstock"><i class="bi bi-archive"></i> Dead Stock</a>
-        <a href="/kategori"><i class="bi-grid"></i> Kategori</a>
+        <a href="{{ route('dashboard') }}" 
+        class="{{ Route::is('dashboard') ? 'active' : '' }}">
+            <i class="bi-house"></i> Dashboard
+        </a>
+
+        <a href="{{ route('penjualan.index') }}" 
+        class="{{ Route::is('penjualan.*') ? 'active' : '' }}">
+            <i class="bi bi-cash-stack"></i> Penjualan
+        </a>
+
+        <a href="{{ route('barang.index') }}" 
+        class="{{ Route::is('barang.*') ? 'active' : '' }}">
+            <i class="bi bi-box"></i> Barang
+        </a>
+
+        <a href="{{ route('pembelian.index') }}" 
+            class="{{ Route::is('pembelian.*') ? 'active' : '' }}">
+                <i class="bi bi-arrow-repeat"></i> Pembelian
+
+                @if($jumlahRestok > 0)
+                    <span class="badge bg-danger ms-2">
+                        {{ $jumlahRestok }}
+                    </span>
+                @endif
+        </a>
+
+        <a href="{{ route('deadstock.index') }}" 
+        class="{{ Route::is('deadstock.*') ? 'active' : '' }}">
+            <i class="bi bi-archive"></i> Dead Stock
+        </a>
+
+        <a href="{{ route('kategori.index') }}" 
+        class="{{ Route::is('kategori.*') ? 'active' : '' }}">
+            <i class="bi-grid"></i> Kategori
+        </a>
     </div>
 
    <div class="logout">
