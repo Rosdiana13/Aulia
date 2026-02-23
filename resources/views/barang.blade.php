@@ -174,7 +174,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button class="btn btn-sm btn-danger"
-                                                onclick="return confirm('Hapus barang?')">
+                                                onclick="return confirm('Anda yakin mau hapus barang?')">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>

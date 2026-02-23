@@ -5,6 +5,10 @@
         ->whereColumn('jumlah', '<=', 'min_stok')
         ->where('status', 1)
         ->count();
+
+    $jumlahDeadStock = DB::table('v_dead_stock')
+        ->where('lama_mengendap', '>=', 30) // default 30 hari
+        ->count();
 @endphp
 
 <!DOCTYPE html>
@@ -108,6 +112,12 @@
         <a href="{{ route('deadstock.index') }}" 
         class="{{ Route::is('deadstock.*') ? 'active' : '' }}">
             <i class="bi bi-archive"></i> Dead Stock
+
+            @if($jumlahDeadStock > 0)
+                <span class="badge bg-danger ms-2">
+                    {{ $jumlahDeadStock }}
+                </span>
+            @endif
         </a>
 
         <a href="{{ route('kategori.index') }}" 

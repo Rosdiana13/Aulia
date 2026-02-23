@@ -27,10 +27,10 @@ class DataBarangController extends Controller
         $request->validate([
             'nama_barang' => 'required|max:200',
             'id_kategori' => 'required',
-            'harga_beli'  => 'required|numeric',
-            'harga_jual'  => 'required|numeric',
+            'harga_beli'  => 'required|numeric|min:1',
+            'harga_jual'  => 'required|numeric|min:1',
             'jumlah'      => 'required|numeric|min:1',
-            'min_stok'    => 'required|numeric|min:0'
+            'min_stok'    => 'required|numeric|min:1'
         ]);
 
         try {
