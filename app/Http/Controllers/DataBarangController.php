@@ -22,15 +22,17 @@ class DataBarangController extends Controller
         return view('barang', compact('barang', 'kategori'));
     }
 
-   public function store(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'nama_barang' => 'required|max:200',
             'id_kategori' => 'required',
             'harga_beli'  => 'required|numeric|min:1',
-            'harga_jual'  => 'required|numeric|min:1',
+            'harga_jual'  => 'required|numeric|min:1|gte:harga_beli',
             'jumlah'      => 'required|numeric|min:1',
             'min_stok'    => 'required|numeric|min:1'
+        ], [
+            'harga_jual.gte' => 'Harga jual tidak boleh lebih kecil dari harga beli'
         ]);
 
         try {
@@ -59,11 +61,20 @@ class DataBarangController extends Controller
         $request->validate([
             'nama_barang' => 'required|max:200',
             'id_kategori' => 'required',
-            'harga_jual'  => 'required|numeric',
-            'min_stok'    => 'required|numeric|min:0'
+            'harga_jual'  => 'required|numeric|min:1',
+            'min_stok'    => 'required|numeric|min:1'
         ]);
 
         try {
+
+            // Ambil data barang lama
+            $barang = DataBarang::findOrFail($id);
+
+            // Cek harga jual tidak boleh < harga beli
+            if ($request->harga_jual < $barang->harga_beli) {
+                return redirect()->back()
+                    ->with('error', 'Harga jual tidak boleh lebih kecil dari harga beli');
+            }
 
             DB::statement('CALL sp_update_barang(?, ?, ?, ?, ?)', [
                 $id,
