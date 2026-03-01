@@ -21,7 +21,7 @@ class PembelianController extends Controller
         return view('pembelian', compact('barang_restok'));
     }
 
-    public function restok(Request $request)
+   public function restok(Request $request)
     {
         $request->validate([
             'id_barang' => 'required',
@@ -33,29 +33,30 @@ class PembelianController extends Controller
 
         try {
 
-            $barang = DataBarang::findOrFail($request->id_barang);
+            $barang = DataBarang::lockForUpdate()
+                        ->findOrFail($request->id_barang);
 
-            // Tambah stok dulu
+            // 1️⃣ Tambah stok global
             $barang->update([
                 'jumlah' => $barang->jumlah + $request->qty_masuk
             ]);
 
-            // Hitung subtotal
             $subtotal = $request->qty_masuk * $request->harga_beli_baru;
 
-            // Buat header pembelian
+            // 2️⃣ Header pembelian
             $pembelian = Pembelian::create([
                 'id' => Str::uuid(),
                 'id_pengguna' => auth()->user()->id,
-                'total_pembelian' => 0 // nanti trigger update
+                'total_pembelian' => $subtotal
             ]);
 
-            // Insert detail pembelian
+            // 3️⃣ Detail pembelian (WAJIB ada sisa_stok untuk FIFO)
             DetailPembelian::create([
                 'id' => Str::uuid(),
                 'id_data_barang' => $barang->id,
                 'id_pembelian' => $pembelian->id,
                 'jumlah' => $request->qty_masuk,
+                'sisa_stok' => $request->qty_masuk, // 🔥 PENTING
                 'harga_beli_baru' => $request->harga_beli_baru,
                 'sub_total_pembelian' => $subtotal
             ]);
@@ -68,7 +69,7 @@ class PembelianController extends Controller
 
             DB::rollBack();
 
-            return back()->with('error', 'Terjadi kesalahan saat restok');
+            return back()->with('error', $e->getMessage());
         }
     }
 }

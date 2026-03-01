@@ -19,6 +19,7 @@ class DetailPembelian extends Model
         'id_data_barang',
         'id_pembelian',
         'jumlah',
+        'sisa_stok',
         'harga_beli_baru',
         'sub_total_pembelian'
     ];
@@ -42,5 +43,10 @@ class DetailPembelian extends Model
     public function pembelian()
     {
         return $this->belongsTo(Pembelian::class, 'id_pembelian');
+    }
+
+    public function penjualanBatch()
+    {
+        return $this->hasMany(DetailPenjualanBatch::class, 'id_detail_pembelian');
     }
 }

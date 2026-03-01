@@ -29,4 +29,9 @@ class DetailPenjualan extends Model
     {
         return $this->belongsTo(Penjualan::class, 'id_penjualan');
     }
+
+     public function batch()
+    {
+        return $this->hasMany(DetailPenjualanBatch::class, 'id_detail_penjualan');
+    }
 }

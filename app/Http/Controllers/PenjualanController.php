@@ -38,21 +38,26 @@ class PenjualanController extends Controller
                 'total_transaksi' => 0
             ]);
 
+            $totalTransaksi = 0;
+
             foreach ($items as $item) {
 
-                DetailPenjualan::create([
-                    'id' => (string) Str::uuid(),
-                    'id_penjualan' => $idPenjualan,
-                    'id_data_barang' => $item['id'],
-                    'jumlah' => $item['qty'],
-                    'harga_saat_ini' => $item['harga'],
-                    'sub_total_penjualan' => $item['qty'] * $item['harga']
+                DB::statement('CALL sp_penjualan_fifo(?, ?, ?, ?)', [
+                    $idPenjualan,
+                    $item['id'],
+                    $item['qty'],
+                    $item['harga']
                 ]);
+
+                $totalTransaksi += $item['qty'] * $item['harga'];
             }
+
+            Penjualan::where('id', $idPenjualan)
+                ->update(['total_transaksi' => $totalTransaksi]);
 
             DB::commit();
 
-            return back()->with('success', 'Transaksi berhasil disimpan');
+            return back()->with('success', 'Transaksi berhasil');
 
         } catch (\Exception $e) {
 
