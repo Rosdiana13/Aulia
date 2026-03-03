@@ -1,10 +1,9 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\DataBarang;
-use App\Models\Penjualan;
-use App\Models\DetailPenjualan;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -17,21 +16,26 @@ class DashboardController extends Controller
         // Total stok unit
         $total_stok = DataBarang::where('status', 1)->sum('jumlah');
 
-        // Penjualan hari ini
-        $penjualan_hari_ini = DetailPenjualan::join('penjualan', 'detail_penjualan.id_penjualan', '=', 'penjualan.id')
-            ->join('data_barang', 'detail_penjualan.id_data_barang', '=', 'data_barang.id')
-            ->whereDate('penjualan.tanggal_penjualan', today())
+        // Penjualan hari ini (Pagination)
+        $penjualan_hari_ini = DB::table('detail_penjualan as dp')
+            ->join('penjualan as p', 'dp.id_penjualan', '=', 'p.id')
+            ->join('data_barang as db', 'dp.id_data_barang', '=', 'db.id')
+            ->whereDate('p.tanggal_penjualan', now()->toDateString())
             ->select(
-                'data_barang.nama_barang',
-                'penjualan.tanggal_penjualan as tanggal',
-                'detail_penjualan.jumlah',
-                'detail_penjualan.harga_saat_ini as harga_jual',
-                'detail_penjualan.sub_total_penjualan as subtotal'
+                'db.nama_barang',
+                'p.tanggal_penjualan as tanggal',
+                'dp.jumlah',
+                'dp.harga_saat_ini as harga_jual',
+                'dp.sub_total_penjualan as subtotal'
             )
-            ->get();
+            ->orderBy('p.tanggal_penjualan', 'desc')
+            ->paginate(5);
 
-        // Total pendapatan hari ini
-        $total_pendapatan_hari_ini = $penjualan_hari_ini->sum('subtotal');
+        // Total pendapatan hari ini (query terpisah supaya tidak ikut pagination)
+        $total_pendapatan_hari_ini = DB::table('detail_penjualan as dp')
+            ->join('penjualan as p', 'dp.id_penjualan', '=', 'p.id')
+            ->whereDate('p.tanggal_penjualan', now()->toDateString())
+            ->sum('dp.sub_total_penjualan');
 
         return view('dashboard', compact(
             'total_barang',

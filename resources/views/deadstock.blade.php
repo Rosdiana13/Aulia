@@ -97,7 +97,8 @@
                         <th width="50">No</th>
                         <th class="text-start">Nama Barang</th>
                         <th>Kategori</th>
-                        <th>Stok</th>
+                        <th>Stok Awal</th>
+                        <th>Sisa Stok</th>
                         <th>Tanggal Masuk</th>
                         <th>Lama Mengendap (Hari)</th>
                     </tr>
@@ -108,9 +109,10 @@
                         <td class="text-center">{{ $loop->iteration }}</td>
                         <td class="fw-bold">{{ $item->nama_barang }}</td>
                         <td class="text-center">{{ $item->Nama_Kategori }}</td>
-                        <td class="text-center">{{ $item->stok }}</td>
+                        <td class="text-center">{{ $item->jumlah_awal }}</td>
+                        <td class="text-center">{{ $item->sisa_stok }}</td>
                         <td class="text-center">
-                            {{ \Carbon\Carbon::parse($item->tanggal_masuk)->format('d/m/Y') }}
+                            {{ \Carbon\Carbon::parse($item->tanggal_beli)->format('d/m/Y') }}
                         </td>
                         <td class="text-center text-danger fw-bold">
                             {{ $item->lama_mengendap }}
@@ -118,7 +120,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center text-muted p-4">
+                        <td colspan="7" class="text-center text-muted p-4">
                             Tidak ada dead stock dengan batas {{ $days }} hari
                         </td>
                     </tr>
@@ -142,16 +144,19 @@
     });
 
     // Export Excel
-    function exportToExcel(filename = '') {
-        let table = document.getElementById("tableToExport");
-        let html = table.outerHTML;
-        let url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
-        let link = document.createElement("a");
-        link.href = url;
-        link.download = filename + '.xls';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    function exportToExcel() {
+    let table = document.getElementById("tableToExport");
+    let wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.table_to_sheet(table);
+
+    XLSX.utils.book_append_sheet(wb, ws, "Dead Stock");
+
+    let today = new Date();
+    let tanggal = today.getFullYear() + '-' +
+                  (today.getMonth()+1) + '-' +
+                  today.getDate();
+
+    XLSX.writeFile(wb, "laporan-dead-stock-" + tanggal + ".xlsx");
     }
 </script>
 

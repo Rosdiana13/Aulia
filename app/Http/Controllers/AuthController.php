@@ -31,16 +31,6 @@ class AuthController extends Controller
             'nama_pengguna' => 'Username salah atau password salah',
         ])->onlyInput('nama_pengguna');
     }
-
-    public function showRegisterForm()
-    {
-        $semua_pengguna = \App\Models\User::where('status', 1)
-                            ->orderBy('nama_pengguna', 'asc')
-                            ->get();
-        
-        return view('pengguna', compact('semua_pengguna'));
-    }
-
     
     public function logout(Request $request)
     {

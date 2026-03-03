@@ -53,35 +53,48 @@
 </div>
 
 <!-- PENJUALAN HARI INI -->
-<div class="card border-0 shadow-sm">
-    <div class="card-header bg-white py-3">
+<!-- PENJUALAN HARI INI -->
+<div class="card border-0 shadow-sm mt-4">
+
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <h5 class="mb-0 fw-bold text-dark">
             <i class="bi bi-cart-check text-success me-2"></i>
             Penjualan Hari Ini
         </h5>
+        <small class="text-muted">
+            {{ now()->format('d F Y') }}
+        </small>
     </div>
 
     <div class="card-body p-0">
+
         <div class="table-responsive">
-            <table class="table table-hover mb-0 text-center align-middle">
-                <thead class="table-light text-secondary">
+            <table class="table table-hover mb-0 align-middle">
+
+                <thead class="table-light text-secondary text-center">
                     <tr>
-                        <th>No</th>
+                        <th width="5%">No</th>
                         <th class="text-start">Nama Barang</th>
-                        <th>Tanggal</th>
-                        <th>Jumlah</th>
-                        <th>Harga Jual</th>
-                        <th>Subtotal</th>
+                        <th width="15%">Tanggal</th>
+                        <th width="10%">Jumlah</th>
+                        <th width="15%">Harga Jual</th>
+                        <th width="15%">Subtotal</th>
                     </tr>
                 </thead>
 
-                <tbody>
+                <tbody class="text-center">
                     @forelse($penjualan_hari_ini as $p)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td class="text-start fw-bold">{{ $p->nama_barang }}</td>
-                        <td>{{ \Carbon\Carbon::parse($p->tanggal)->format('d-m-Y') }}</td>
-                        <td>{{ $p->jumlah }}</td>
+                        <td>
+                            {{ ($penjualan_hari_ini->currentPage() - 1) * $penjualan_hari_ini->perPage() + $loop->iteration }}
+                        </td>
+                        <td class="text-start fw-semibold">
+                            {{ $p->nama_barang }}
+                        </td>
+                        <td>
+                            {{ \Carbon\Carbon::parse($p->tanggal)->format('d-m-Y') }}
+                        </td>
+                        <td>{{ number_format($p->jumlah) }}</td>
                         <td>Rp {{ number_format($p->harga_jual, 0, ',', '.') }}</td>
                         <td class="fw-bold">
                             Rp {{ number_format($p->subtotal, 0, ',', '.') }}
@@ -89,7 +102,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-muted p-4">
+                        <td colspan="6" class="text-muted py-4">
                             Belum ada transaksi hari ini
                         </td>
                     </tr>
@@ -106,8 +119,25 @@
                         </th>
                     </tr>
                 </tfoot>
+
             </table>
         </div>
+
+        {{-- Pagination --}}
+        @if($penjualan_hari_ini->hasPages())
+        <div class="d-flex justify-content-between align-items-center px-3 py-3 border-top bg-light">
+            <div class="text-muted small">
+                Menampilkan {{ $penjualan_hari_ini->firstItem() }} -
+                {{ $penjualan_hari_ini->lastItem() }}
+                dari {{ $penjualan_hari_ini->total() }} data
+            </div>
+
+            <div>
+                {{ $penjualan_hari_ini->links('pagination::bootstrap-4') }}
+            </div>
+        </div>
+        @endif
+
     </div>
 </div>
 
