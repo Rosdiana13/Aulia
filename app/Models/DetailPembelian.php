@@ -23,30 +23,4 @@ class DetailPembelian extends Model
         'harga_beli_baru',
         'sub_total_pembelian'
     ];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            if (!$model->id) {
-                $model->id = (string) Str::uuid();
-            }
-        });
-    }
-
-    public function barang()
-    {
-        return $this->belongsTo(DataBarang::class, 'id_data_barang');
-    }
-
-    public function pembelian()
-    {
-        return $this->belongsTo(Pembelian::class, 'id_pembelian');
-    }
-
-    public function penjualanBatch()
-    {
-        return $this->hasMany(DetailPenjualanBatch::class, 'id_detail_pembelian');
-    }
 }

@@ -17,19 +17,26 @@ class AuthController extends Controller
 
    public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'nama_pengguna' => 'required|string',
-            'password' => 'required|string',
+        $request->validate([
+            'nama_pengguna' => 'required',
+            'password' => 'required'
         ]);
 
-        if (Auth::attempt(['nama_pengguna' => $request->nama_pengguna, 'password' => $request->password, 'status' => 1])) {
+        $user = User::where('nama_pengguna', $request->nama_pengguna)
+                    ->where('status', 1)
+                    ->first();
+
+        if ($user && $user->password == $request->password) {
+
+            Auth::login($user);
             $request->session()->regenerate();
-            return redirect()->intended('/dashboard')->with('login_success', 'Selamat Datang!');
+
+            return redirect('/dashboard')->with('login_success','Selamat Datang!');
         }
 
         return back()->withErrors([
-            'nama_pengguna' => 'Username salah atau password salah',
-        ])->onlyInput('nama_pengguna');
+            'nama_pengguna' => 'Username atau password salah'
+        ]);
     }
     
     public function logout(Request $request)

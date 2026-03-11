@@ -19,20 +19,4 @@ class Pembelian extends Model
         'id_pengguna',
         'total_pembelian'
     ];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            if (!$model->id) {
-                $model->id = (string) Str::uuid();
-            }
-        });
-    }
-
-    public function detail()
-    {
-        return $this->hasMany(DetailPembelian::class, 'id_pembelian');
-    }
 }

@@ -2,16 +2,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Penjualan;
-use App\Models\DetailPenjualan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use \App\Models\DataBarang;
 use Illuminate\Support\Str;
 
 class PenjualanController extends Controller
 {
     public function index()
     {
-        $barang = \App\Models\DataBarang::where('status', 1)
+        $barang = DataBarang::where('status', 1)
                     ->where('jumlah', '>', 0)
                     ->get();
 

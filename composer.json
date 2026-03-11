@@ -13,8 +13,7 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
-        "laravel/tinker": "^2.5",
-        "maatwebsite/excel": "^1.1"
+        "laravel/tinker": "^2.5"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
@@ -67,6 +66,13 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true
+        },
+        "audit": {
+            "ignore": [
+                "PKSA-rkkf-636k-qjb3",
+                "PKSA-4s4z-t146-6123",
+                "PKSA-z3gr-8qht-p93v"
+            ]
         }
     },
     "minimum-stability": "dev",

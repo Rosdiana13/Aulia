@@ -31,6 +31,15 @@
     </div>
 @endif
 
+<style>
+    .table-responsive thead th{
+    position: sticky;
+    top: 0;
+    background: #f8f9fa;
+    z-index: 1;
+    }
+</style>
+
 
 <div class="row">
     {{-- FORM TAMBAH --}}
@@ -129,7 +138,7 @@
                 </div>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
+                <div class="table-responsive overflow-auto" style="max-height:500px;">
                     <table class="table table-hover table-striped mb-0 text-center">
                         <thead class="table-light">
                             <tr>

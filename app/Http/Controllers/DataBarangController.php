@@ -67,10 +67,8 @@ class DataBarangController extends Controller
 
         try {
 
-            // Ambil data barang lama
             $barang = DataBarang::findOrFail($id);
 
-            // Cek harga jual tidak boleh < harga beli
             if ($request->harga_jual < $barang->harga_beli) {
                 return redirect()->back()
                     ->with('error', 'Harga jual tidak boleh lebih kecil dari harga beli');

@@ -19,19 +19,4 @@ class DetailPenjualan extends Model
         'harga_saat_ini',
         'sub_total_penjualan'
     ];
-
-    public function barang()
-    {
-        return $this->belongsTo(DataBarang::class, 'id_data_barang');
-    }
-
-    public function penjualan()
-    {
-        return $this->belongsTo(Penjualan::class, 'id_penjualan');
-    }
-
-     public function batch()
-    {
-        return $this->hasMany(DetailPenjualanBatch::class, 'id_detail_penjualan');
-    }
 }

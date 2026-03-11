@@ -25,25 +25,9 @@ class DataBarang extends Model
         'status'
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            if (!$model->id) {
-                $model->id = (string) Str::uuid();
-            }
-        });
-    }
-
     public function kategori()
     {
         return $this->belongsTo(Kategori::class, 'id_kategori');
-    }
-
-    public function detailPenjualan()
-    {
-        return $this->hasMany(DetailPenjualan::class, 'id_data_barang');
     }
 
 }

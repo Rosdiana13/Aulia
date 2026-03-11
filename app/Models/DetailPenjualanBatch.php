@@ -17,14 +17,4 @@ class DetailPenjualanBatch extends Model
         'id_detail_pembelian',
         'qty_diambil'
     ];
-
-    public function detailPenjualan()
-    {
-        return $this->belongsTo(DetailPenjualan::class, 'id_detail_penjualan');
-    }
-
-    public function detailPembelian()
-    {
-        return $this->belongsTo(DetailPembelian::class, 'id_detail_pembelian');
-    }
 }
