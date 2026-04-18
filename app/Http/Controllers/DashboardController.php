@@ -37,11 +37,54 @@ class DashboardController extends Controller
             ->whereDate('p.tanggal_penjualan', now()->toDateString())
             ->sum('dp.sub_total_penjualan');
 
+        // Ambil filter
+        $filter = request('filter', 'harian');
+        $range = request('range', 30);
+
+        // =======================
+        // HARlAN (default 30 hari)
+        // =======================
+        if ($filter == 'harian') {
+
+            $grafik_penjualan = DB::table('penjualan')
+                ->selectRaw('DATE(tanggal_penjualan) as tanggal, SUM(total_transaksi) as total')
+                ->where('tanggal_penjualan', '>=', now()->subDays($range))
+                ->groupBy('tanggal')
+                ->orderBy('tanggal')
+                ->get();
+
+            $tanggal = $grafik_penjualan->pluck('tanggal')->map(function($tgl){
+                return \Carbon\Carbon::parse($tgl)->format('d M');
+            });
+
+        }
+
+        // =======================
+        // BULANAN (12 bulan)
+        // =======================
+        else {
+
+            $grafik_penjualan = DB::table('penjualan')
+                ->selectRaw('DATE_FORMAT(tanggal_penjualan, "%Y-%m") as bulan, SUM(total_transaksi) as total')
+                ->where('tanggal_penjualan', '>=', now()->subMonths(12))
+                ->groupBy('bulan')
+                ->orderBy('bulan')
+                ->get();
+
+            $tanggal = $grafik_penjualan->pluck('bulan')->map(function($bln){
+                return \Carbon\Carbon::parse($bln . '-01')->format('M Y');
+            });
+        }
+
+        $total_penjualan = $grafik_penjualan->pluck('total');
+
         return view('dashboard', compact(
             'total_barang',
             'total_stok',
             'penjualan_hari_ini',
-            'total_pendapatan_hari_ini'
+            'total_pendapatan_hari_ini',
+            'tanggal',
+            'total_penjualan'
         ));
     }
 }

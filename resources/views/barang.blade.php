@@ -4,10 +4,21 @@
 
 @section('content')
 
-<div class="mb-4 p-3 text-white rounded shadow-sm" style="background:#1F447A;">
+<div class="mb-4 p-3 text-white rounded shadow-sm d-flex justify-content-between align-items-center" 
+     style="background:#1F447A;">
+
+    <!-- KIRI -->
     <h4 class="mb-0">
         <i class="bi bi-box"></i> Manajemen Data Barang
     </h4>
+
+    <!-- KANAN -->
+    <button class="btn btn-success btn-sm"
+        data-bs-toggle="modal"
+        data-bs-target="#modalLabel">
+        <i class="bi bi-download"></i> Download Label
+    </button>
+
 </div>
 
 @if (session('success'))
@@ -188,14 +199,19 @@
                                         </button>
                                     </form>
 
-                                    <button class="btn btn-sm btn-success"
-                                  onclick="downloadLabel(
-                                    '{{ $item->nama_barang }}',
-                                    '{{ number_format($item->harga_jual,0,',','.') }}',
-                                    '{{ $item->jumlah }}'
-                                )">
-                                    <i class="bi bi-download"></i>
-                                </button>
+                                    <!-- <button class="btn btn-sm btn-success"
+                                        onclick="downloadLabel(
+                                            '{{ $item->nama_barang }}',
+                                            '{{ number_format($item->harga_jual,0,',','.') }}',
+                                            '{{ $item->jumlah }}'
+                                        )">
+                                            <i class="bi bi-download"></i>
+                                    </button> -->
+
+                                    <button class="btn btn-sm btn-info"
+                                        onclick="showHistory('{{ $item->id }}')">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
                                 </td>
                             </tr>
 
@@ -284,6 +300,68 @@
                 </div>
             </div>
         </form>
+    </div>
+</div>
+
+<div class="modal fade" id="modalHistory" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Riwayat Pembelian</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div id="historyContent">
+                    <p class="text-center">Loading...</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalLabel" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Download Label</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- PILIH BARANG -->
+                <div class="mb-2">
+                    <label>Barang</label>
+                    <select id="barangSelect" class="form-select">
+                        @foreach($barang as $b)
+                        <option value="{{ $b->id }}"
+                            data-nama="{{ $b->nama_barang }}"
+                            data-harga="{{ $b->harga_jual }}"
+                            data-stok="{{ $b->jumlah }}">
+                            {{ $b->nama_barang }} (Stok: {{ $b->jumlah }})
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- JUMLAH -->
+                <div class="mb-2">
+                    <label>Jumlah Label</label>
+                    <input type="number" id="jumlahLabel" class="form-control" value="1">
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button class="btn btn-success" onclick="prosesDownloadLabel()">Download</button>
+            </div>
+
+        </div>
     </div>
 </div>
 
@@ -402,7 +480,7 @@ function downloadLabel(nama, harga, jumlah) {
                 text-align: center;
             }
 
-            /* 🔥 FIX LOGO CENTER */
+            /*FIX LOGO CENTER */
             .header {
                 display: flex;
                 flex-direction: column;
@@ -472,6 +550,57 @@ function downloadLabel(nama, harga, jumlah) {
     };
 
     html2pdf().set(opt).from(element).save();
+}
+
+
+
+function prosesDownloadLabel(){
+
+    let select = document.getElementById('barangSelect');
+    let selected = select.options[select.selectedIndex];
+
+    let nama = selected.getAttribute('data-nama');
+    let harga = selected.getAttribute('data-harga');
+    let stok = parseInt(selected.getAttribute('data-stok'));
+
+    let jumlah = parseInt(document.getElementById('jumlahLabel').value);
+
+    if(!jumlah || jumlah <= 0){
+        alert("Jumlah tidak valid");
+        return;
+    }
+
+    if(jumlah > stok){
+        alert("Jumlah melebihi stok!");
+        return;
+    }
+
+    downloadLabel(nama, harga, jumlah);
+}
+
+function showHistory(id){
+
+    let url = "{{ route('barang.history', ':id') }}";
+    url = url.replace(':id', id);
+
+    fetch(url, {
+        credentials: 'same-origin'
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Status " + res.status);
+        return res.text();
+    })
+    .then(html => {
+
+        document.getElementById('historyContent').innerHTML = html;
+
+        let modal = new bootstrap.Modal(document.getElementById('modalHistory'));
+        modal.show();
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Gagal load history");
+    });
 }
 </script>
 

@@ -89,14 +89,19 @@
             <i class="bi-house"></i> Dashboard
         </a>
 
-        <a href="{{ route('penjualan.index') }}" 
-        class="{{ Route::is('penjualan.*') ? 'active' : '' }}">
-            <i class="bi bi-cash-stack"></i> Penjualan
+        <a href="{{ route('kategori.index') }}" 
+        class="{{ Route::is('kategori.*') ? 'active' : '' }}">
+            <i class="bi-grid"></i> Kategori
         </a>
 
         <a href="{{ route('barang.index') }}" 
         class="{{ Route::is('barang.*') ? 'active' : '' }}">
             <i class="bi bi-box"></i> Barang
+        </a>
+
+        <a href="{{ route('penjualan.index') }}" 
+        class="{{ Route::is('penjualan.*') ? 'active' : '' }}">
+            <i class="bi bi-cash-stack"></i> Penjualan
         </a>
 
         <a href="{{ route('pembelian.index') }}" 
@@ -120,11 +125,6 @@
                 </span>
             @endif
         </a>
-
-        <a href="{{ route('kategori.index') }}" 
-        class="{{ Route::is('kategori.*') ? 'active' : '' }}">
-            <i class="bi-grid"></i> Kategori
-        </a>
     </div>
 
    <div class="logout">
@@ -147,6 +147,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @stack('scripts')
 </body>
 </html>

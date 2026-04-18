@@ -104,4 +104,14 @@ class DataBarangController extends Controller
             return redirect()->back()->with('error', $message);
         }
     }
+
+    public function history($id)
+    {
+        $data = DB::table('v_history_pembelian')
+            ->where('id_data_barang', $id)
+            ->orderBy('tanggal_beli', 'asc')
+            ->get();
+
+        return view('history_pembelian', compact('data'));
+    }
 }

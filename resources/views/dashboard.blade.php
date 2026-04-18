@@ -52,7 +52,51 @@
     </div>
 </div>
 
-<!-- PENJUALAN HARI INI -->
+<!-- GRAFIK -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h5 class="fw-bold mb-0">
+            @if(request('filter','harian')=='harian')
+                Grafik Penjualan Harian
+            @else
+                Grafik Penjualan Bulanan
+            @endif
+        </h5>
+
+        <form method="GET" class="d-flex gap-2">
+
+            <select name="filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="harian" {{ request('filter','harian')=='harian'?'selected':'' }}>Harian</option>
+                <option value="bulanan" {{ request('filter')=='bulanan'?'selected':'' }}>Bulanan</option>
+            </select>
+
+            @if(request('filter','harian')=='harian')
+            <select name="range" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="7" {{ request('range')=='7'?'selected':'' }}>7 Hari</option>
+                <option value="30" {{ request('range',30)=='30'?'selected':'' }}>30 Hari</option>
+                <option value="90" {{ request('range')=='90'?'selected':'' }}>90 Hari</option>
+            </select>
+            @endif
+
+        </form>
+    </div>
+
+    <div class="card-body">
+        <canvas id="grafikPenjualan" height="100"></canvas>
+
+        <small class="text-muted">
+            @if(request('filter','harian')=='harian')
+                Menampilkan {{ request('range',30) }} hari terakhir
+            @else
+                Menampilkan 12 bulan terakhir
+            @endif
+        </small>
+    </div>
+
+</div>
+
 <!-- PENJUALAN HARI INI -->
 <div class="card border-0 shadow-sm mt-4">
 
@@ -155,6 +199,8 @@
     </div>
 </div>
 
+@push('scripts')
+
 <script>
 window.onload = function() {
     const alert = document.getElementById('success-alert');
@@ -186,6 +232,62 @@ function exportToExcel() {
 
     XLSX.writeFile(wb, "penjualan-harian-" + tanggal + ".xlsx");
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const labels = @json($tanggal ?? []);
+    const dataPenjualan = @json($total_penjualan ?? []);
+
+    if (!labels.length) {
+        console.warn("Data grafik kosong");
+        return;
+    }
+
+    const canvas = document.getElementById('grafikPenjualan');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Total Penjualan (Rp)',
+                data: dataPenjualan,
+                borderColor: '#1F447A',
+                backgroundColor: 'rgba(31, 68, 122, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Rp ' + context.raw.toLocaleString('id-ID');
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'Rp ' + value.toLocaleString('id-ID');
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+});
 </script>
+@endpush
 
 @endsection
