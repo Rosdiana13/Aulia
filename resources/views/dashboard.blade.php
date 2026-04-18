@@ -36,7 +36,7 @@
 
     <!-- TOTAL STOK -->
     <div class="col-md-6">
-        <div class="card border-0 shadow-sm text-white" style="background: #28a745;">
+        <div class="card border-0 shadow-sm text-white" style="background: #1F447A;">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
@@ -50,51 +50,6 @@
             </div>
         </div>
     </div>
-</div>
-
-<!-- GRAFIK -->
-<div class="card shadow-sm mb-4">
-
-    <div class="card-header d-flex justify-content-between align-items-center">
-
-        <h5 class="fw-bold mb-0">
-            @if(request('filter','harian')=='harian')
-                Grafik Penjualan Harian
-            @else
-                Grafik Penjualan Bulanan
-            @endif
-        </h5>
-
-        <form method="GET" class="d-flex gap-2">
-
-            <select name="filter" class="form-select form-select-sm" onchange="this.form.submit()">
-                <option value="harian" {{ request('filter','harian')=='harian'?'selected':'' }}>Harian</option>
-                <option value="bulanan" {{ request('filter')=='bulanan'?'selected':'' }}>Bulanan</option>
-            </select>
-
-            @if(request('filter','harian')=='harian')
-            <select name="range" class="form-select form-select-sm" onchange="this.form.submit()">
-                <option value="7" {{ request('range')=='7'?'selected':'' }}>7 Hari</option>
-                <option value="30" {{ request('range',30)=='30'?'selected':'' }}>30 Hari</option>
-                <option value="90" {{ request('range')=='90'?'selected':'' }}>90 Hari</option>
-            </select>
-            @endif
-
-        </form>
-    </div>
-
-    <div class="card-body">
-        <canvas id="grafikPenjualan" height="100"></canvas>
-
-        <small class="text-muted">
-            @if(request('filter','harian')=='harian')
-                Menampilkan {{ request('range',30) }} hari terakhir
-            @else
-                Menampilkan 12 bulan terakhir
-            @endif
-        </small>
-    </div>
-
 </div>
 
 <!-- PENJUALAN HARI INI -->
@@ -198,6 +153,109 @@
 
     </div>
 </div>
+
+<!-- BARANG PERLU RESTOK -->
+<div class="card border-0 shadow-sm mt-4">
+
+    <div class="card-header py-3" style="background: #1F447A;">
+        <h5 class="mb-0 fw-bold text-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Barang Perlu Restok
+        </h5>
+    </div>
+
+    <div class="card-body p-0">
+
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+
+                <thead class="table-light text-center">
+                    <tr>
+                        <th>Nama Barang</th>
+                        <th>Kategori</th>
+                        <th>Stok</th>
+                        <th>Min Stok</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody class="text-center">
+                    @forelse($barang_restok as $b)
+                    <tr>
+                        <td class="text-start fw-semibold">
+                            {{ $b->nama_barang }}
+                        </td>
+                        <td>{{ $b->kategori->Nama_Kategori }}</td>
+                        <td class="text-danger fw-bold">
+                            {{ $b->jumlah }}
+                        </td>
+                        <td>{{ $b->min_stok }}</td>
+                        <td>
+                            <span class="badge bg-danger">
+                                Perlu Restok
+                            </span>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="text-muted py-4">
+                            Semua stok aman 
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- GRAFIK -->
+<div class="card shadow-sm mt-4">
+
+    <div class="card-header d-flex justify-content-between align-items-center text-white" style="background: #1F447A;">
+
+        <h5 class="fw-bold mb-0" >
+            @if(request('filter','harian')=='harian')
+                Grafik Penjualan Harian
+            @else
+                Grafik Penjualan Bulanan
+            @endif
+        </h5>
+
+        <form method="GET" class="d-flex gap-2">
+
+            <select name="filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="harian" {{ request('filter','harian')=='harian'?'selected':'' }}>Harian</option>
+                <option value="bulanan" {{ request('filter')=='bulanan'?'selected':'' }}>Bulanan</option>
+            </select>
+
+            @if(request('filter','harian')=='harian')
+            <select name="range" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="7" {{ request('range')=='7'?'selected':'' }}>7 Hari</option>
+                <option value="30" {{ request('range',30)=='30'?'selected':'' }}>30 Hari</option>
+                <option value="90" {{ request('range')=='90'?'selected':'' }}>90 Hari</option>
+            </select>
+            @endif
+
+        </form>
+    </div>
+
+    <div class="card-body">
+        <canvas id="grafikPenjualan" height="100"></canvas>
+
+        <small class="text-muted">
+            @if(request('filter','harian')=='harian')
+                Menampilkan {{ request('range',30) }} hari terakhir
+            @else
+                Menampilkan 12 bulan terakhir
+            @endif
+        </small>
+    </div>
+
+</div>
+
 
 @push('scripts')
 

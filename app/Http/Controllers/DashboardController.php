@@ -10,6 +10,13 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $barang_restok = DataBarang::with('kategori')
+                        ->whereColumn('jumlah', '<=', 'min_stok')
+                        ->where('status', 1)
+                        ->orderBy('jumlah', 'asc') 
+                        ->limit(5) 
+                        ->get();
+                        
         // Total jenis barang aktif
         $total_barang = DataBarang::where('status', 1)->count();
 
@@ -84,7 +91,8 @@ class DashboardController extends Controller
             'penjualan_hari_ini',
             'total_pendapatan_hari_ini',
             'tanggal',
-            'total_penjualan'
+            'total_penjualan',
+            'barang_restok'
         ));
     }
 }

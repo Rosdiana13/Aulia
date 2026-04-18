@@ -5,6 +5,7 @@
         <tr>
             <th>Tanggal</th>
             <th>Jumlah</th>
+            <th>Sisa Stok</th>
             <th>Harga</th>
             <th>Subtotal</th>
         </tr>
@@ -17,6 +18,7 @@
                 {{ $d->tanggal_beli ? \Carbon\Carbon::parse($d->tanggal_beli)->format('d-m-Y') : '-' }}
             </td>
             <td>{{ $d->jumlah }}</td>
+             <td>{{ $d->sisa_stok }}</td>
             <td>Rp {{ number_format($d->harga) }}</td>
             <td>Rp {{ number_format($d->subtotal) }}</td>
         </tr>
