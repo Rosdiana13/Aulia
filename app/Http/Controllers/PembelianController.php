@@ -36,27 +36,27 @@ class PembelianController extends Controller
             $barang = DataBarang::lockForUpdate()
                         ->findOrFail($request->id_barang);
 
-            // 1️⃣ Tambah stok global
+            // 1️ Tambah stok global
             $barang->update([
                 'jumlah' => $barang->jumlah + $request->qty_masuk
             ]);
 
             $subtotal = $request->qty_masuk * $request->harga_beli_baru;
 
-            // 2️⃣ Header pembelian
+            // 2️ Header pembelian
             $pembelian = Pembelian::create([
                 'id' => Str::uuid(),
                 'id_pengguna' => auth()->user()->id,
                 'total_pembelian' => $subtotal
             ]);
 
-            // 3️⃣ Detail pembelian (WAJIB ada sisa_stok untuk FIFO)
+            // 3 Detail pembelian (WAJIB ada sisa_stok untuk FIFO)
             DetailPembelian::create([
                 'id' => Str::uuid(),
                 'id_data_barang' => $barang->id,
                 'id_pembelian' => $pembelian->id,
                 'jumlah' => $request->qty_masuk,
-                'sisa_stok' => $request->qty_masuk, // 🔥 PENTING
+                'sisa_stok' => $request->qty_masuk,
                 'harga_beli_baru' => $request->harga_beli_baru,
                 'sub_total_pembelian' => $subtotal
             ]);

@@ -57,19 +57,33 @@
 <div class="card border-0 shadow-sm mt-4">
 
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+    
+        <!-- KIRI -->
         <h5 class="mb-0 fw-bold text-dark">
             <i class="bi bi-cart-check text-success me-2"></i>
             Penjualan Hari Ini
         </h5>
-        <small class="text-muted">
-            {{ now()->format('d F Y') }}
-        </small>
+
+        <!-- KANAN -->
+        <div class="d-flex align-items-center gap-2">
+            
+            <!-- Tombol -->
+            <button onclick="exportToExcel()" class="btn btn-success btn-sm">
+                <i class="bi bi-file-earmark-excel"></i> Export Excel
+            </button>
+
+            <!-- Tanggal -->
+            <small class="text-muted">
+                {{ now()->format('d F Y') }}
+            </small>
+
+        </div>
     </div>
 
     <div class="card-body p-0">
 
         <div class="table-responsive">
-            <table class="table table-hover mb-0 align-middle">
+            <table id="tableToExport" class="table table-hover mb-0 align-middle">
 
                 <thead class="table-light text-secondary text-center">
                     <tr>
@@ -151,6 +165,27 @@ window.onload = function() {
         }, 3000);
     }
 };
+
+function exportToExcel() {
+    let table = document.getElementById("tableToExport");
+
+    if (!table) {
+        alert("Tabel tidak ditemukan!");
+        return;
+    }
+
+    let wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.table_to_sheet(table);
+
+    XLSX.utils.book_append_sheet(wb, ws, "Penjualan Harian");
+
+    let today = new Date();
+    let tanggal = today.getFullYear() + '-' +
+                  String(today.getMonth()+1).padStart(2, '0') + '-' +
+                  String(today.getDate()).padStart(2, '0');
+
+    XLSX.writeFile(wb, "penjualan-harian-" + tanggal + ".xlsx");
+}
 </script>
 
 @endsection

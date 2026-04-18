@@ -98,7 +98,6 @@
                         <th class="text-start">Nama Barang</th>
                         <th>Kategori</th>
                         <th>Stok Awal</th>
-                        <th>Sisa Stok</th>
                         <th>Tanggal Masuk</th>
                         <th>Lama Mengendap (Hari)</th>
                     </tr>
@@ -109,10 +108,9 @@
                         <td class="text-center">{{ $loop->iteration }}</td>
                         <td class="fw-bold">{{ $item->nama_barang }}</td>
                         <td class="text-center">{{ $item->Nama_Kategori }}</td>
-                        <td class="text-center">{{ $item->jumlah_awal }}</td>
-                        <td class="text-center">{{ $item->sisa_stok }}</td>
+                        <td class="text-center">{{ $item->stok }}</td>
                         <td class="text-center">
-                            {{ \Carbon\Carbon::parse($item->tanggal_beli)->format('d/m/Y') }}
+                            {{ \Carbon\Carbon::parse($item->tanggal_masuk)->format('d/m/Y') }}
                         </td>
                         <td class="text-center text-danger fw-bold">
                             {{ $item->lama_mengendap }}

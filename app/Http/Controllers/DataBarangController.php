@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\DataBarang;
 use App\Models\Pembelian;
-use App\Models\DetailPembelian;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

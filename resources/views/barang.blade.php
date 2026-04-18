@@ -187,6 +187,15 @@
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
+
+                                    <button class="btn btn-sm btn-success"
+                                  onclick="downloadLabel(
+                                    '{{ $item->nama_barang }}',
+                                    '{{ number_format($item->harga_jual,0,',','.') }}',
+                                    '{{ $item->jumlah }}'
+                                )">
+                                    <i class="bi bi-download"></i>
+                                </button>
                                 </td>
                             </tr>
 
@@ -348,6 +357,122 @@ document.getElementById('formEdit').addEventListener('submit', function () {
             bsAlert.close();
         }
     }, 5000);
+
+const logoToko = "{{ asset('storage/images/Logo_Aulia.png') }}";
+const namaToko = "Aulia Store";
+
+function downloadLabel(nama, harga, jumlah) {
+
+    let perPage = 40; // 4 kolom x 10 baris (lebih cocok stiker kecil)
+
+    let element = document.createElement('div');
+
+    let html = `
+        <style>
+            @page {
+                size: A4;
+                margin: 5mm;
+            }
+
+            body {
+                font-family: Arial;
+                margin: 0;
+            }
+
+            .page {
+                page-break-after: always;
+            }
+
+            .container {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 4px;
+            }
+
+            .label {
+                width: 100%;
+                height: 3cm;
+                border: 1px dashed #999;
+                padding: 4px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                font-size: 10px;
+                text-align: center;
+            }
+
+            /* 🔥 FIX LOGO CENTER */
+            .header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 2px;
+            }
+
+            .logo {
+                height: 18px;
+                object-fit: contain;
+            }
+
+            .toko {
+                font-size: 9px;
+                font-weight: bold;
+            }
+
+            .nama {
+                font-size: 10px;
+                margin: 2px 0;
+            }
+
+            .harga {
+                font-size: 14px;
+                font-weight: bold;
+                border-top: 1px solid #000;
+                padding-top: 2px;
+                width: 100%;
+            }
+        </style>
+    `;
+
+    for (let i = 0; i < jumlah; i++) {
+
+        if (i % perPage === 0) {
+            html += `<div class="page"><div class="container">`;
+        }
+
+        html += `
+            <div class="label">
+
+                <div class="header">
+                    <img src="${logoToko}" class="logo">
+                    <div class="toko">${namaToko}</div>
+                </div>
+
+                <div class="nama">${nama}</div>
+
+                <div class="harga">Rp ${harga}</div>
+
+            </div>
+        `;
+
+        if ((i + 1) % perPage === 0 || i === jumlah - 1) {
+            html += `</div></div>`;
+        }
+    }
+
+    element.innerHTML = html;
+
+    let opt = {
+        margin: 5,
+        filename: `label-${nama}.pdf`,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 3, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
 </script>
 
 
