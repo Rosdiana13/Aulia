@@ -10,6 +10,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // Jumlah Barang Dead Stock
         $days = 30;
 
         $total_deadstock = DB::table('v_dead_stock')
@@ -17,6 +18,7 @@ class DashboardController extends Controller
             ->count();
 
 
+        // Menapilkan Barang Untuk di Restok
         $barang_restok = DataBarang::with('kategori')
                         ->whereColumn('jumlah', '<=', 'min_stok')
                         ->where('status', 1)
@@ -55,9 +57,7 @@ class DashboardController extends Controller
         $filter = request('filter', 'harian');
         $range = request('range', 30);
 
-        // =======================
         // HARlAN (default 30 hari)
-        // =======================
         if ($filter == 'harian') {
 
             $grafik_penjualan = DB::table('penjualan')
@@ -73,9 +73,7 @@ class DashboardController extends Controller
 
         }
 
-        // =======================
-        // BULANAN (12 bulan)
-        // =======================
+        // Grafik BULANAN
         else {
 
             $grafik_penjualan = DB::table('penjualan')
