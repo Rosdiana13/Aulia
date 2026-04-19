@@ -10,6 +10,13 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $days = 30;
+
+        $total_deadstock = DB::table('v_dead_stock')
+            ->where('lama_mengendap', '>=', $days)
+            ->count();
+
+
         $barang_restok = DataBarang::with('kategori')
                         ->whereColumn('jumlah', '<=', 'min_stok')
                         ->where('status', 1)
@@ -92,7 +99,8 @@ class DashboardController extends Controller
             'total_pendapatan_hari_ini',
             'tanggal',
             'total_penjualan',
-            'barang_restok'
+            'barang_restok',
+            'total_deadstock'
         ));
     }
 }

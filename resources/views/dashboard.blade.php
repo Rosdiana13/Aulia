@@ -17,39 +17,58 @@
 </div>
 
 <div class="row mb-4">
+
     <!-- TOTAL BARANG -->
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card border-0 shadow-sm text-white" style="background: #1F447A;">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-uppercase mb-1" style="font-size: 0.8rem; opacity: 0.8;">
-                            Total Barang (Jenis)
+                        <h6 class="text-uppercase mb-1 small opacity-75">
+                            Total Barang
                         </h6>
                         <h2 class="mb-0 fw-bold">{{ $total_barang }}</h2>
                     </div>
-                    <i class="bi bi-box-seam" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                    <i class="bi bi-box-seam fs-1 opacity-25"></i>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- TOTAL STOK -->
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm text-white" style="background: #1F447A;">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm text-white" style="background: #28a745;">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-uppercase mb-1" style="font-size: 0.8rem; opacity: 0.8;">
-                            Total Stok (Unit)
+                        <h6 class="text-uppercase mb-1 small opacity-75">
+                            Total Stok
                         </h6>
                         <h2 class="mb-0 fw-bold">{{ $total_stok }}</h2>
                     </div>
-                    <i class="bi bi-stack" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                    <i class="bi bi-stack fs-1 opacity-25"></i>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- DEAD STOCK -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm text-white" style="background: #dc3545;">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1 small opacity-75">
+                            Dead Stock (≥ 30 Hari)
+                        </h6>
+                        <h2 class="mb-0 fw-bold">{{ $total_deadstock }}</h2>
+                    </div>
+                    <i class="bi bi-exclamation-triangle fs-1 opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <!-- PENJUALAN HARI INI -->
