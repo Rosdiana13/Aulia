@@ -18,7 +18,15 @@ class PembelianController extends Controller
             ->where('status', 1)
             ->get();
 
-        return view('pembelian', compact('barang_restok'));
+        // semua produk
+        $semua_barang = DataBarang::with('kategori')
+            ->where('status', 1)
+            ->get();
+
+        return view('pembelian', compact(
+            'barang_restok',
+            'semua_barang'
+        ));
     }
 
    public function restok(Request $request)

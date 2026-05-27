@@ -141,14 +141,37 @@
                     @endforelse
                 </tbody>
 
-                <tfoot class="table-light">
+              <tfoot class="table-light">
                     <tr>
-                        <th colspan="5" class="text-end">
-                            Total Pendapatan Hari Ini:
+
+                        <th colspan="3" class="text-end align-middle">
+                            Total Hari Ini
                         </th>
-                        <th class="text-primary fs-5">
+
+                        <!-- Total Sebelum Diskon -->
+                        <th class="text-primary text-center">
+                            <small class="d-block text-muted">
+                                Sebelum Diskon
+                            </small>
+                            Rp {{ number_format($total_pendapatan_hari_ini + $total_diskon_hari_ini, 0, ',', '.') }}
+                        </th>
+
+                        <!-- Total Diskon -->
+                        <th class="text-danger text-center">
+                            <small class="d-block text-muted">
+                                Total Diskon
+                            </small>
+                            Rp {{ number_format($total_diskon_hari_ini, 0, ',', '.') }}
+                        </th>
+
+                        <!-- Total Akhir -->
+                        <th class="text-success text-center fs-5">
+                            <small class="d-block text-muted">
+                                Total Akhir
+                            </small>
                             Rp {{ number_format($total_pendapatan_hari_ini, 0, ',', '.') }}
                         </th>
+
                     </tr>
                 </tfoot>
 

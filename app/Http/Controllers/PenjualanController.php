@@ -18,6 +18,26 @@ class PenjualanController extends Controller
         return view('penjualan', compact('barang'));
     }
 
+    public function history(Request $request)
+    {
+        $query = DB::table('v_history_penjualan');
+
+        // Filter tanggal
+        if ($request->tanggal_awal && $request->tanggal_akhir) {
+
+            $query->whereBetween('tanggal_penjualan', [
+                $request->tanggal_awal,
+                $request->tanggal_akhir
+            ]);
+        }
+
+        $history_penjualan = $query
+            ->orderBy('tanggal_penjualan', 'desc')
+            ->paginate(10);
+
+        return view('history_penjualan', compact('history_penjualan'));
+    }
+
    public function store(Request $request)
     {
         $items = json_decode($request->items, true);
@@ -31,6 +51,9 @@ class PenjualanController extends Controller
             DB::beginTransaction();
 
             $idPenjualan = (string) Str::uuid();
+
+            // TAMBAHAN
+            $diskon = $request->diskon ?? 0;
 
             Penjualan::create([
                 'id' => $idPenjualan,
@@ -52,8 +75,19 @@ class PenjualanController extends Controller
                 $totalTransaksi += $item['qty'] * $item['harga'];
             }
 
+            // TAMBAHAN
+            $totalAkhir = $totalTransaksi - $diskon;
+
+            if ($totalAkhir < 0) {
+                $totalAkhir = 0;
+            }
+
             Penjualan::where('id', $idPenjualan)
-                ->update(['total_transaksi' => $totalTransaksi]);
+                ->update([
+                    'total_sebelum_diskon' => $totalTransaksi,
+                    'diskon' => $diskon,
+                    'total_transaksi' => $totalAkhir
+                ]);
 
             DB::commit();
 

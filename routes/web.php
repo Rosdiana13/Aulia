@@ -46,6 +46,7 @@ Route::middleware(['auth'])->group(function () {
     // PENJUALAN
     Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
     Route::post('/penjualan', [PenjualanController::class, 'store'])->name('penjualan.store');
+    Route::get('/history-penjualan',[PenjualanController::class, 'history'])->name('penjualan.history');
 
     // Pembelian
     Route::get('/pembelian', [PembelianController::class, 'index'])->name('pembelian.index');

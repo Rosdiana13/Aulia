@@ -176,6 +176,77 @@
     </div>
 </div>
 
+<div class="card shadow-sm border-0 mt-5">
+    <div class="card-header text-white d-flex justify-content-between align-items-center" style="background:#1F447A;">
+        <span>Daftar Barang untuk Restok</span>
+        
+        <div class="col-md-4">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-light">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="searchSemuaBarang" class="form-control" placeholder="Cari nama barang...">
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-start ps-3">Nama Barang</th>
+                        <th>Kategori</th>
+                        <th>Batas Min</th>
+                        <th>Stok Tersisa</th>
+                        <th width="15%">Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableSemuaBarang">
+                    @forelse($semua_barang as $item)
+                    <tr>
+                        <td class="text-start ps-3">
+                            <strong>{{ $item->nama_barang }}</strong>
+                        </td>
+                        <td>
+                            <small class="text-muted">
+                                {{ $item->kategori->Nama_Kategori ?? '-' }}
+                            </small>
+                        </td>
+                        <td>{{ $item->min_stok }}</td>
+                        <td class="fw-bold text-danger">
+                            {{ $item->jumlah }}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary w-100"
+                                data-bs-toggle="modal"
+                                data-bs-target="#restokModal"
+                                onclick="setRestok(
+                                    '{{ $item->id }}',
+                                    '{{ $item->nama_barang }}',
+                                    '{{ $item->jumlah }}',
+                                    '{{ $item->min_stok }}',
+                                    '{{ $item->harga_beli }}'
+                                )">
+                                Restok
+                            </button>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="p-4 text-muted">
+                            Semua stok dalam kondisi aman
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+
 <script>
 
 document.getElementById('searchInput').addEventListener('keyup', function() {
@@ -227,6 +298,24 @@ setTimeout(function () {
             bsAlert.close();
         }
     }, 5000);
+
+
+document.getElementById('searchSemuaBarang')
+.addEventListener('keyup', function () {
+
+    let filter = this.value.toLowerCase();
+
+    let rows = document.querySelectorAll(
+        '#tableSemuaBarang tr'
+    );
+
+    rows.forEach(row => {
+        let text = row.textContent.toLowerCase();
+
+        row.style.display =
+            text.includes(filter) ? '' : 'none';
+    });
+});
 
 </script>
 

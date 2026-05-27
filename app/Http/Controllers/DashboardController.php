@@ -48,10 +48,13 @@ class DashboardController extends Controller
             ->paginate(5);
 
         // Total pendapatan hari ini (query terpisah supaya tidak ikut pagination)
-        $total_pendapatan_hari_ini = DB::table('detail_penjualan as dp')
-            ->join('penjualan as p', 'dp.id_penjualan', '=', 'p.id')
-            ->whereDate('p.tanggal_penjualan', now()->toDateString())
-            ->sum('dp.sub_total_penjualan');
+        $total_pendapatan_hari_ini = DB::table('penjualan')
+        ->whereDate('tanggal_penjualan', now()->toDateString())
+        ->sum('total_transaksi');
+
+        $total_diskon_hari_ini = DB::table('penjualan')
+        ->whereDate('tanggal_penjualan', now()->toDateString())
+        ->sum('diskon');
 
         // Ambil filter
         $filter = request('filter', 'harian');
@@ -95,6 +98,7 @@ class DashboardController extends Controller
             'total_stok',
             'penjualan_hari_ini',
             'total_pendapatan_hari_ini',
+            'total_diskon_hari_ini',
             'tanggal',
             'total_penjualan',
             'barang_restok',

@@ -99,10 +99,50 @@
             <i class="bi bi-box"></i> Barang
         </a>
 
-        <a href="{{ route('penjualan.index') }}" 
+        <!-- <a href="{{ route('penjualan.index') }}" 
         class="{{ Route::is('penjualan.*') ? 'active' : '' }}">
             <i class="bi bi-cash-stack"></i> Penjualan
+        </a> -->
+
+        <!-- MENU PENJUALAN -->
+        <a class="d-flex justify-content-between align-items-center
+            {{ Route::is('penjualan.*') || Route::is('penjualan.history') ? 'active' : '' }}"
+
+            data-bs-toggle="collapse"
+            href="#menuPenjualan"
+            role="button">
+
+            <span>
+                <i class="bi bi-cash-stack"></i>
+                Penjualan
+            </span>
+
+            <i class="bi bi-chevron-down small"></i>
         </a>
+
+        <!-- SUB MENU -->
+        <div class="collapse
+            {{ Route::is('penjualan.*') ? 'show' : '' }}"
+            id="menuPenjualan">
+
+            <div class="ms-4 mt-2 d-flex flex-column gap-2">
+
+                <a href="{{ route('penjualan.index') }}"
+                    class="{{ Route::is('penjualan.index') ? 'active' : '' }}">
+
+                    <i class="bi bi-cart-plus"></i>
+                    Transaksi Penjualan
+                </a>
+
+                <a href="{{ route('penjualan.history') }}"
+                    class="{{ Route::is('penjualan.history') ? 'active' : '' }}">
+
+                    <i class="bi bi-clock-history"></i>
+                    History Penjualan
+                </a>
+
+            </div>
+        </div>
 
         <a href="{{ route('pembelian.index') }}" 
             class="{{ Route::is('pembelian.*') ? 'active' : '' }}">

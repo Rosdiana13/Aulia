@@ -84,7 +84,7 @@
                     <thead class="table-light">
                         <tr>
                             <th class="text-start ps-3">Nama Barang</th>
-                            <th>Qty</th>
+                            <th>Jumlah</th>
                             <th>Harga</th>
                             <th class="text-end pe-3">Subtotal</th>
                             <th>Aksi</th>
@@ -102,6 +102,15 @@
         <!-- TOTAL -->
         <div class="card shadow-sm border-0 mt-3">
             <div class="card-body d-flex justify-content-between align-items-center bg-light">
+                <div class="me-4" style="width:200px;">
+                    <label class="form-label fw-bold">Diskon</label>
+                    <input type="text"
+                        name="diskon"
+                        id="input-diskon"
+                        class="form-control input-rupiah"
+                        value="0"
+                        oninput="renderTabel()">
+                </div>
                 <div>
                     <span class="text-muted fw-bold">TOTAL:</span>
                     <h3 class="mb-0 fw-bold text-primary">
@@ -190,7 +199,12 @@ function renderTabel() {
         </tr>`;
     });
 
-    document.getElementById('label-total').innerText = total.toLocaleString('id-ID');
+    const diskon = rupiahToNumber(document.getElementById('input-diskon').value);
+
+    const totalAkhir = Math.max(total - diskon, 0);
+
+    document.getElementById('label-total').innerText =
+        totalAkhir.toLocaleString('id-ID');
 }
 
 function ubahQty(index, qty) {
@@ -217,6 +231,50 @@ setTimeout(function () {
         bsAlert.close();
     }
 }, 5000);
+
+
+function rupiahToNumber(value) {
+    if (!value) return 0;
+
+    return parseInt(
+        value.replace(/\D/g, ''),
+        10
+    ) || 0;
+}
+
+function numberToRupiah(number) {
+    if (!number) return "0";
+
+    return parseInt(number, 10)
+        .toLocaleString('id-ID');
+}
+
+document.addEventListener('input', function(e) {
+
+    if (e.target.classList.contains('input-rupiah')) {
+
+        e.target.value = numberToRupiah(
+            rupiahToNumber(e.target.value)
+        );
+
+        renderTabel();
+    }
+
+});
+
+document.getElementById('form-penjualan')
+.addEventListener('submit', function () {
+
+    document.getElementById('input-items').value =
+        JSON.stringify(keranjang);
+
+    // ubah diskon jadi angka murni
+    const inputDiskon =
+        document.getElementById('input-diskon');
+
+    inputDiskon.value =
+        rupiahToNumber(inputDiskon.value);
+});
 </script>
 
 @endsection
