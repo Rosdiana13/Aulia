@@ -24,50 +24,67 @@
 
         <!-- FILTER -->
         <form method="GET"
-            action="{{ route('penjualan.history') }}"
-            class="row g-3 align-items-end mb-4">
+                action="{{ route('penjualan.history') }}"
+                class="row g-3 align-items-end mb-4">
 
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Dari Tanggal
-                </label>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">
+                        Dari Tanggal
+                    </label>
 
-                <input type="date"
-                    name="tanggal_awal"
-                    class="form-control"
-                    value="{{ request('tanggal_awal') }}">
-            </div>
+                    <input type="date"
+                        name="tanggal_awal"
+                        class="form-control"
+                        value="{{ request('tanggal_awal') }}">
+                </div>
 
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    Sampai Tanggal
-                </label>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">
+                        Sampai Tanggal
+                    </label>
 
-                <input type="date"
-                    name="tanggal_akhir"
-                    class="form-control"
-                    value="{{ request('tanggal_akhir') }}">
-            </div>
+                    <input type="date"
+                        name="tanggal_akhir"
+                        class="form-control"
+                        value="{{ request('tanggal_akhir') }}">
+                </div>
 
-            <div class="col-md-4 d-flex gap-2">
+                <div class="col-md-2">
+                    <button type="submit"
+                        class="btn text-white w-100"
+                        style="background:#1F447A;">
 
-                <button type="submit"
-                    class="btn text-white"
-                    style="background:#1F447A;">
+                        <i class="bi bi-funnel"></i>
+                        Filter
+                    </button>
+                </div>
 
-                    <i class="bi bi-funnel"></i>
-                    Filter
-                </button>
+                <div class="col-md-4">
 
-                <a href="{{ route('penjualan.history') }}"
-                    class="btn btn-secondary">
+                    <label class="form-label fw-bold">
+                        Cari Barang
+                    </label>
 
-                    Reset
-                </a>
+                    <div class="d-flex gap-2">
 
-            </div>
+                        <input type="text"
+                           name="search"
+                            id="searchInput"
+                            class="form-control"
+                            placeholder="Cari nama barang..."
+                            value="{{ request('search') }}">
 
-        </form>
+                        <a href="{{ route('penjualan.history') }}"
+                            class="btn btn-secondary">
+
+                            Reset
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
 
         <!-- TABEL -->
         <div class="table-responsive">
@@ -161,5 +178,18 @@
     </div>
 
 </div>
+
+<script>
+
+document.getElementById('searchInput')
+    .addEventListener('input', function () {
+
+        clearTimeout(window.delaySearch);
+
+        window.delaySearch = setTimeout(() => {
+            this.form.submit();
+        }, 500);
+    });
+</script>
 
 @endsection

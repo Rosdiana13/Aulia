@@ -10,8 +10,21 @@ class DataBarangController extends Controller
 {
     public function index()
     {
-        $barang = DataBarang::with('kategori')
-            ->where('status', 1)
+            $barang = DB::table('data_barang as db')
+            ->leftJoin('kategori as k', 'db.id_kategori', '=', 'k.id')
+            ->select(
+                'db.*',
+                'k.Nama_Kategori',
+                DB::raw('
+                    (
+                        (SELECT COALESCE(SUM(dp2.jumlah),0)
+                        FROM detail_pembelian dp2
+                        WHERE dp2.id_data_barang = db.id)
+                        - db.jumlah
+                    ) as stok_terjual
+                ')
+            )
+            ->where('db.status', 1)
             ->get();
 
         $kategori = Kategori::where('status', 1)->get();
@@ -111,5 +124,35 @@ class DataBarangController extends Controller
             ->get();
 
         return view('history_pembelian', compact('data'));
+    }
+
+    public function exportExcel()
+    {
+        $data = DB::table('data_barang as db')
+            ->select(
+                'db.nama_barang',
+                'db.jumlah as sisa_stok',
+                DB::raw('
+                    (
+                        (SELECT COALESCE(SUM(dp2.jumlah),0)
+                        FROM detail_pembelian dp2
+                        WHERE dp2.id_data_barang = db.id)
+                        - db.jumlah
+                    ) as stok_terjual
+                ')
+            )
+            ->where('db.status', 1)
+            ->get();
+
+        $filename = "laporan-stok.xls";
+
+        $headers = [
+            "Content-Type" => "application/vnd.ms-excel",
+            "Content-Disposition" => "attachment; filename=$filename"
+        ];
+
+        return response()
+            ->view('export_barang_excel', compact('data'))
+            ->withHeaders($headers);
     }
 }

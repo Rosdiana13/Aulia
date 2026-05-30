@@ -117,7 +117,7 @@
                 Penjualan
             </span>
 
-            <i class="bi bi-chevron-down small"></i>
+            <i></i>
         </a>
 
         <!-- SUB MENU -->
@@ -138,7 +138,7 @@
                     class="{{ Route::is('penjualan.history') ? 'active' : '' }}">
 
                     <i class="bi bi-clock-history"></i>
-                    History Penjualan
+                    Riwayat Penjualan
                 </a>
 
             </div>

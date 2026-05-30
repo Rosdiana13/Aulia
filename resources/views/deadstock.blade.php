@@ -98,10 +98,9 @@
                         <th class="text-start">Nama Barang</th>
                         <th>Kategori</th>
                         <th>Stok Pembelian</th>
-                        <th>Stok Saat Ini</th>
-                        <th>Stok Terjual</th>
-                        <th>Tanggal Masuk</th>
+                         <th>Pembelian Pada Tanggal</th>
                         <th>Lama Mengendap (Hari)</th>
+                        <th>Sisa Stok</th>
                     </tr>
                 </thead>
                 <tbody id="isiLaporan">
@@ -111,14 +110,13 @@
                         <td class="fw-bold">{{ $item->nama_barang }}</td>
                         <td class="text-center">{{ $item->Nama_Kategori }}</td>
                         <td class="text-center">{{ $item->jumlah_awal }}</td>
-                        <td class="text-center">{{ $item->sisa_stok }}</td>
-                        <td class="text-center">{{ $item->stok_terjual }}</td>
                         <td class="text-center">
                             {{ \Carbon\Carbon::parse($item->tanggal_beli)->format('d/m/Y') }}
                         </td>
                         <td class="text-center text-danger fw-bold">
                             {{ $item->lama_mengendap }}
                         </td>
+                        <td class="text-center">{{ $item->sisa_stok }}</td>
                     </tr>
                     @empty
                     <tr>

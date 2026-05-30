@@ -22,13 +22,17 @@ class PenjualanController extends Controller
     {
         $query = DB::table('v_history_penjualan');
 
-        // Filter tanggal
         if ($request->tanggal_awal && $request->tanggal_akhir) {
 
             $query->whereBetween('tanggal_penjualan', [
                 $request->tanggal_awal,
                 $request->tanggal_akhir
             ]);
+        }
+
+         if ($request->search) {
+
+            $query->where('nama_barang', 'like', '%' . $request->search . '%');
         }
 
         $history_penjualan = $query

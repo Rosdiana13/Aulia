@@ -91,7 +91,7 @@
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-danger"
                                             onclick="return confirm('Kategori akan dinonaktifkan dan bisa diaktifkan kembali. Lanjutkan?')">
-                                        <i class="bi bi-trash"></i> Hapus
+                                        <i class="bi bi-trash"></i> Non Aktif
                                     </button>
                                 </form>
                             </td>

@@ -14,9 +14,9 @@
 
     <!-- KANAN -->
     <button class="btn btn-success btn-sm"
-        data-bs-toggle="modal"
-        data-bs-target="#modalLabel">
-        <i class="bi bi-download"></i> Download Label
+        onclick="downloadExcel()">
+        <i class="bi bi-file-earmark-excel"></i>
+        Download Excel
     </button>
 
 </div>
@@ -168,7 +168,7 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td class="text-start"><strong>{{ $item->nama_barang }}</strong></td>
-                                <td><span>{{ $item->kategori->Nama_Kategori }}</span></td>
+                                <td><span>{{ $item->Nama_Kategori }}</span></td>
                                 <td>{{ $item->jumlah }}</td>
                                 <td>{{ number_format($item->harga_beli,0,',','.') }}</td>
                                 <td>{{ number_format($item->harga_jual,0,',','.') }}</td>
@@ -242,7 +242,7 @@
 
             <div class="modal-content border-0">
                 <div class="modal-header text-white" style="background:#1F447A;">
-                    <h5 class="modal-title">Edit Produk (Demo)</h5>
+                    <h5 class="modal-title">Edit Produk</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -322,48 +322,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalLabel" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
 
-            <div class="modal-header">
-                <h5 class="modal-title">Download Label</h5>
-                <button class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-
-                <!-- PILIH BARANG -->
-                <div class="mb-2">
-                    <label>Barang</label>
-                    <select id="barangSelect" class="form-select">
-                        @foreach($barang as $b)
-                        <option value="{{ $b->id }}"
-                            data-nama="{{ $b->nama_barang }}"
-                            data-harga="{{ $b->harga_jual }}"
-                            data-stok="{{ $b->jumlah }}">
-                            {{ $b->nama_barang }} (Stok: {{ $b->jumlah }})
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- JUMLAH -->
-                <div class="mb-2">
-                    <label>Jumlah Label</label>
-                    <input type="number" id="jumlahLabel" class="form-control" value="1">
-                </div>
-
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button class="btn btn-success" onclick="prosesDownloadLabel()">Download</button>
-            </div>
-
-        </div>
-    </div>
-</div>
 
 <script>
 
@@ -436,147 +395,6 @@ document.getElementById('formEdit').addEventListener('submit', function () {
         }
     }, 5000);
 
-const logoToko = "{{ asset('storage/images/Logo_Aulia.png') }}";
-const namaToko = "Aulia Store";
-
-function downloadLabel(nama, harga, jumlah) {
-
-    let perPage = 40; // 4 kolom x 10 baris (lebih cocok stiker kecil)
-
-    let element = document.createElement('div');
-
-    let html = `
-        <style>
-            @page {
-                size: A4;
-                margin: 5mm;
-            }
-
-            body {
-                font-family: Arial;
-                margin: 0;
-            }
-
-            .page {
-                page-break-after: always;
-            }
-
-            .container {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 4px;
-            }
-
-            .label {
-                width: 100%;
-                height: 3cm;
-                border: 1px dashed #999;
-                padding: 4px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                font-size: 10px;
-                text-align: center;
-            }
-
-            /*FIX LOGO CENTER */
-            .header {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                margin-bottom: 2px;
-            }
-
-            .logo {
-                height: 18px;
-                object-fit: contain;
-            }
-
-            .toko {
-                font-size: 9px;
-                font-weight: bold;
-            }
-
-            .nama {
-                font-size: 10px;
-                margin: 2px 0;
-            }
-
-            .harga {
-                font-size: 14px;
-                font-weight: bold;
-                border-top: 1px solid #000;
-                padding-top: 2px;
-                width: 100%;
-            }
-        </style>
-    `;
-
-    for (let i = 0; i < jumlah; i++) {
-
-        if (i % perPage === 0) {
-            html += `<div class="page"><div class="container">`;
-        }
-
-        html += `
-            <div class="label">
-
-                <div class="header">
-                    <img src="${logoToko}" class="logo">
-                    <div class="toko">${namaToko}</div>
-                </div>
-
-                <div class="nama">${nama}</div>
-
-                <div class="harga">Rp ${harga}</div>
-
-            </div>
-        `;
-
-        if ((i + 1) % perPage === 0 || i === jumlah - 1) {
-            html += `</div></div>`;
-        }
-    }
-
-    element.innerHTML = html;
-
-    let opt = {
-        margin: 5,
-        filename: `label-${nama}.pdf`,
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 3, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(element).save();
-}
-
-
-
-function prosesDownloadLabel(){
-
-    let select = document.getElementById('barangSelect');
-    let selected = select.options[select.selectedIndex];
-
-    let nama = selected.getAttribute('data-nama');
-    let harga = selected.getAttribute('data-harga');
-    let stok = parseInt(selected.getAttribute('data-stok'));
-
-    let jumlah = parseInt(document.getElementById('jumlahLabel').value);
-
-    if(!jumlah || jumlah <= 0){
-        alert("Jumlah tidak valid");
-        return;
-    }
-
-    if(jumlah > stok){
-        alert("Jumlah melebihi stok!");
-        return;
-    }
-
-    downloadLabel(nama, harga, jumlah);
-}
 
 function showHistory(id){
 
@@ -602,6 +420,51 @@ function showHistory(id){
         alert("Gagal load history");
     });
 }
+
+
+function downloadExcel() {
+
+    let data = [];
+
+    // HEADER
+    data.push([
+        "Nama Barang",
+        "Stok Terjual",
+        "Sisa Stok"
+    ]);
+
+    // DATA DARI CONTROLLER
+    let barang = @json($barang);
+
+    barang.forEach(item => {
+
+        data.push([
+            item.nama_barang,
+            item.stok_terjual,
+            item.jumlah
+        ]);
+
+    });
+
+    // SHEET
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // WORKBOOK
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+        wb,
+        ws,
+        "Laporan Stok"
+    );
+
+    // DOWNLOAD
+    XLSX.writeFile(
+        wb,
+        "laporan-stok.xlsx"
+    );
+}
+
 </script>
 
 
